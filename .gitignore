@@ -1,0 +1,8 @@
+precompilacao/
+
+.RData
+.lintr
+.Rhistory
+.Rproj.user/
+
+rsconnect/

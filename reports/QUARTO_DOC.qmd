@@ -1,0 +1,2067 @@
+---
+title: ""
+author: ""
+date: ""
+format:
+  pdf:
+    number-sections: true
+    pdf-engine: pdflatex
+    documentclass: article
+    fig-pos: "H"
+    fig-dpi: 600
+    papersize: a4
+    fontsize: 11pt
+    indent: true
+    header-includes: |
+      \usepackage{fontawesome5}
+      \usepackage{enumitem}
+      \usepackage{longtable}
+      \usepackage{booktabs}
+      \usepackage{caption}
+      \input{HEADER.tex}
+    geometry: [left=1.5cm, top=2cm, right=1.5cm, bottom=2cm]
+    tbl-cap-location: top
+    echo: false
+    message: false
+    warning: false
+lang: pt
+params:
+  versao: "1.2"
+  cidade_selecionada: "BELEM"
+  year_initial: 2005
+  data_dir: ""
+---
+
+
+
+```{r}
+#| label: Today
+
+months.label <- c(
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+)
+str.data <- as.Date(Sys.Date(), format = "%Y/%m/%d")
+year.data <- as.numeric(format(str.data, "%Y"))
+month.data <- as.numeric(format(str.data, "%m"))
+day.data <- as.numeric(format(str.data, "%d"))
+
+messag.today <- paste0(day.data, " de ", months.label[month.data], " de ", year.data)
+```
+
+
+
+```{=latex}
+\newcommand{\versao}{1.2}
+\newcommand{\hoje}{`r messag.today`}
+```
+
+
+
+```{=latex}
+\begin{titlepage}
+\BgThispage
+\vspace*{\fill}
+\vspace{7em}
+\begin{flushleft}
+    {\fontsize{35pt}{40pt}\selectfont \bfseries 
+    Boletim Estatístico \\ \vspace{0.25em} 
+    De Frota Veicular \\ \vspace{0.5em} 
+    }
+\end{flushleft}
+\vspace{5em}
+\begin{flushleft}
+  {\fontsize{20pt}{25pt}\selectfont \bfseries 
+  Para \textbf{`r params$cidade_selecionada`} \\ \vskip0.3cm
+  Desde o Ano de \textbf{`r params$year_initial`}
+  }
+\end{flushleft}
+\vspace*{\fill}
+\begin{flushleft}
+    {\large \bfseries 
+   
+  DEPARTAMENTO DE TRÂNSITO DO ESTADO DO PARÁ \\
+    COORDENADORIA DO NÚCLEO DE PLANEJAMENTO \\
+    GERÊNCIA DE ESTATÍSTICA DE TRÂNSITO
+    }
+\end{flushleft}
+\end{titlepage}
+```
+
+
+\newpage
+
+
+
+```{=latex}
+\newpage
+\thispagestyle{empty}
+
+\vspace*{10cm} % empurra tudo para a parte de baixo
+
+\vspace*{\fill}
+\begin{center}
+\textbf{\Large Dados Internacionais de Catalogação na Publicação (CIP)} \\[0.5cm]
+
+\fbox{%
+  \begin{minipage}{0.85\textwidth}
+  \footnotesize
+  \vspace{0.3cm}
+
+  P222b \hspace{1em} Pará. Departamento de Trânsito do Estado do Pará. Gerência de Estatística de Trânsito.\\
+  \hspace*{2.5em} \textbf{Boletim Estatístico da Frota Veicular de `r params$cidade_selecionada` (2015-2025)} / Organização: Kleber Bezerra Salim; Mario Diego Rocha Valente. – Belém: DETRAN/PA, 2026.\\
+
+  \hspace*{2.5em} 41 p. : il. color. ; 29,7 cm.\\
+
+  \hspace*{2.5em} Relatório técnico analítico processado via Linguagem R e Framework Quarto. Inclui dados do Registro Nacional de Veículos Automotores (RENAVAM). \\
+
+  \hspace*{2.5em} 1. Estatística de Trânsito - Pará. 2. Frota Veicular - Municípios. 3. Mobilidade Urbana - Planejamento. 4. Segurança Viária. I. Título. \\
+
+  \hspace*{2.5em} CDD (23. ed.) 388.31098115 \hfill CDU 656.1(811.5)
+  \vspace{0.3cm}
+  \end{minipage}%
+}
+\end{center}
+\vspace{1cm}
+
+```
+
+
+
+\vspace{3cm}
+
+::: {#resumoexecutivo .unnumbered}
+## **RESUMO EXECUTIVO** {.unnumbered .unlisted}
+
+Este boletim técnico apresenta um diagnóstico estatístico abrangente da frota veicular licenciada no Estado do Pará, considerando o período parametrizável definido pelo usuário do relatório. A análise fundamenta-se em registros administrativos oficiais do **Registro Nacional de Veículos Automotores (RENAVAM)** e foi estruturada para oferecer uma visão integrada, confiável e reprodutível da dinâmica veicular no território analisado. A metodologia adotada vai além da descrição tradicional, incorporando um *framework* de ciência de dados implementado na linguagem de programação *open source* \faRProject{}, o que assegura rigor metodológico, integridade dos dados e atualização automática dos indicadores conforme os recortes temporais e territoriais selecionados. As análises contemplam variáveis estratégicas, incluindo evolução temporal dos licenciamentos, tipologia e categoria veicular, características cromáticas, matriz energética predominante e procedência dos veículos. Os resultados consolidados para o município de **`r params$cidade_selecionada`** evidenciam um processo consistente de crescimento da frota, marcado por padrões diferenciados entre veículos de passageiros, carga e uso misto. Tal dinâmica aponta para um cenário de hipermotorização urbana, com implicações diretas sobre a mobilidade, a segurança viária, a demanda por infraestrutura e os impactos ambientais associados ao transporte motorizado. Ao sistematizar e qualificar essas informações, o presente relatório materializa a transição do DETRAN-PA para um modelo de governança orientada por dados (*Data-Driven Public Management*), fornecendo subsídios empíricos robustos para o planejamento de políticas públicas, a priorização de intervenções no sistema viário e o fortalecimento da transparência administrativa. Dessa forma, o boletim consolida-se como instrumento estratégico de apoio à tomada de decisão, alinhado aos princípios da eficiência, da publicidade e da gestão pública baseada em evidências. \vskip0.3cm
+
+**Palavras-chave:** frota veicular; RENAVAM; mobilidade urbana; ciência de dados; governança pública.
+:::
+
+
+\newpage
+
+```{=latex}
+\thispagestyle{empty}
+\begin{center}
+\textbf{\LARGE DEPARTAMENTO DE TRÂNSITO DO ESTADO DO PARÁ} \\[2cm]
+
+\textbf{\large RENATA MIRELLA FREITAS GUIMARAES DE SOUSA COELHO} \\
+ (Diretoria Geral) \\[0.8cm]
+
+\textbf{\large JULIANY MENDONÇA DA SILVA} \\
+ (Diretoria de Habilitação de Condutores e Registro de Veículos) \\[0.8cm]
+
+\textbf{\large JOSÉ BENTO GOUVEIA JUNIOR} \\
+ (Diretoria Técnica e Operacional) \\[0.8cm]
+
+\textbf{\large PRISCILA KAREN MUCELIN CHAVES} \\
+ (Diretoria de Tecnologia e Informática) \\[0.8cm]
+
+\textbf{\large ARLEY COSTA GONÇALVES} \\
+ (Diretoria Administrativo e Financeira) \\[0.8cm]
+
+\textbf{\large RODRIGO GONDIM DA SERRA} \\
+ (Procuradoria Jurídica) \\[0.8cm]
+
+\textbf{\large HELENO MASCARENHAS D’OLIVEIRA} \\
+ (Corregedoria) \\[0.8cm]
+ 
+ \textbf{\large MÁRIO ANDRÉ DA SILVA SANTIAGO} \\
+ (Coordenadoria do Núcleo das Ciretran's) \\[0.8cm]
+ 
+ \textbf{\large ANAUGUSTA BERGER GARCIA MENDONÇA} \\
+ (Coordenadoria do Núcleo de Planejamento) \\[0.8cm]
+ 
+  \textbf{\large CRISTIANI SOUSA DO ROSÁRIO} \\
+ (ASDECOM) 
+ 
+\end{center}
+\vspace*{\fill}
+
+```
+
+
+
+\newpage
+
+
+```{=latex}
+\thispagestyle{empty}
+
+\vspace{0.5cm}
+\hrule
+\vspace{1cm}
+
+\begin{center}
+\textbf{\LARGE EQUIPE TÉCNICA} \\[1.5cm]
+
+\textbf{Anaugusta Berger Garcia Mendonça} \\
+(Coordenadoria do Núcleo de Planejamento)
+
+\vspace{0.5cm}
+\hrule
+\vspace{1cm}
+
+\end{center}
+
+\vspace{1cm}
+
+\begin{multicols}{2}
+\small
+
+\textbf{Clístenes de Alencar Ribeiro} \\
+(Gerência de Planejamento Estratégico) \\[0.3cm]
+
+\textbf{Ederson Jenner Arrelias Costa} \\
+ (Analista de Administração e Finanças) \\[0.3cm]
+
+\textbf{Emerson Almeida Beltrão Lima} \\
+ (Analista de Administração e Finanças) \\[0.3cm]
+
+\textbf{Gleydson José Miranda da Paixão} \\
+ (Analista de Administração e Finanças) \\[0.3cm]
+
+\textbf{Mauricelia Silva Rodrigues Carvalho} \\
+ (Analista de Administração e Finanças) \\[0.3cm]
+
+\textbf{Roselya Lima de Amorim} \\
+ (Assistente Técnica) \\[0.3cm]
+
+\textbf{Tatianne Brito Lima} \\
+ (Analista de Administração e Finanças) \\[0.3cm]
+
+\textbf{Mara Lúcia da Silva Souza} \\
+ (Assistente de Trânsito) \\[2cm]
+
+\textbf{Kleber Bezerra Salim} \\
+(Gerência de Análise e Estatística de Trânsito) \\[0.3cm]
+
+\textbf{Carmem Lúcia Amaral de Oliveira} \\
+ (Analista de Trânsito) \\[0.3cm]
+
+\textbf{Maria Angélica Lima da Rocha} \\
+ (Técnica) \\[0.3cm]
+
+\textbf{Michelle de Oliveira Borges} \\
+ (Analista de Trânsito) \\[0.3cm]
+
+\textbf{Mário Diego Rocha Valente} \\
+ (Analista de Trânsito) \\[0.3cm]
+
+\textbf{Tito Félix de Oliveira} \\
+ (Analista de Sistemas) \\[0.3cm]
+
+\textbf{Breno Cauã Rodrigues da Silva} \\
+ (Estagiário de Estatística-UFPA) \\[0.3cm]
+ 
+ \textbf{João Vitor Costa Pinheiro} \\
+ (Estagiário de Sistemas- FACI/Wyden) \\
+ 
+  \textbf{Gabriel Baia da Silva} \\
+ (Ciência da Computação- UFPA) 
+
+\end{multicols}
+
+```
+
+
+\newpage
+\tableofcontents
+\newpage
+
+
+```{=latex}
+\listoftables
+\addcontentsline{toc}{section}{LISTA DE TABELAS}
+
+\listoffigures
+\addcontentsline{toc}{section}{LISTA DE FIGURAS}
+```
+
+
+
+
+\newpage
+
+```{r}
+#| label: Configurações Iniciais
+#| include: false
+
+# --- PACOTES E OPÇÕES ---
+options(OutDec = ",")
+library(arrow)      
+library(data.table)
+library(lubridate) 
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(gt)
+library(janitor)
+library(here)
+
+# =========================================================================
+# CARREGAMENTO DOS DADOS (Otimizado para Container e Diretórios Temporários)
+# =========================================================================
+
+# 1. Identifica o caminho correto dos dados
+caminho_dados <- if (params$data_dir == "") here::here("data") else params$data_dir
+ds_original <- arrow::open_dataset(file.path(caminho_dados, "FROTA.parquet"))
+
+# 2. Tratamento Inteligente da Localidade
+cidade_escolhida <- params$cidade_selecionada
+cidade_upper <- toupper(cidade_escolhida)
+cidade_sem_acento <- toupper(iconv(cidade_escolhida, from = "UTF-8", to = "ASCII//TRANSLIT"))
+cidades_alvo <- c(cidade_escolhida, cidade_upper, cidade_sem_acento)
+
+# 3. Tratamento do Ano
+ano_inicial <- as.numeric(params$year_initial)
+
+# Filtra a série histórica
+ds_filtrado <- ds_original %>%
+  dplyr::filter(ANO_AJUST >= ano_inicial)
+
+# Se o município NÃO for "TODOS OS MUNICÍPIOS", aplica o filtro da cidade
+if (cidade_escolhida != "TODOS OS MUNICÍPIOS") {
+  ds_filtrado <- ds_filtrado %>%
+    dplyr::filter(LOCAL %in% cidades_alvo)
+}
+
+# 4. Traz pra RAM e Limpa os Nomes
+df_filtrado <- ds_filtrado %>%
+  dplyr::collect() %>%          
+  janitor::clean_names()        
+
+# Trava de segurança
+if (nrow(df_filtrado) == 0) {
+  stop(paste("ERRO FATAL: 0 linhas. Cidade:", cidade_escolhida, "| Ano:", ano_inicial))
+}
+
+# =========================================================================
+# FUNÇÃO AUXILIAR PARA TABELAS (A FUNÇÃO QUE HAVIA SUMIDO)
+# =========================================================================
+criar_tabela_frequencia <- function(dataframe, coluna, titulo_coluna) {
+  
+  coluna_nome_str <- deparse(substitute(coluna))
+  
+  dataframe %>%
+    group_by(data_registro, {{coluna}}) %>%
+    summarise(FREQ = n(), .groups = 'drop') %>%
+    group_by({{coluna}}) %>%
+    summarise(`FREQUÊNCIA` = sum(FREQ)) %>%
+    mutate(`PERCENTUAL (%)` = (`FREQUÊNCIA` / sum(`FREQUÊNCIA`)) * 100) %>%
+    arrange(desc(`FREQUÊNCIA`)) %>%
+    gt(rowname_col = coluna_nome_str) %>%
+    cols_align(
+      align = "center", 
+      columns = everything() 
+    ) %>%
+    tab_stubhead(label = titulo_coluna) %>%
+    fmt_number(
+      columns = c(`FREQUÊNCIA`),
+      decimals = 0,
+      dec_mark = ",",
+      sep_mark = "."
+    ) %>%
+    grand_summary_rows(
+      columns = c(`FREQUÊNCIA`),
+      fns = list(label = "TOTAL", id = "totals", fn = "sum"),
+      fmt = ~fmt_number(., decimals = 0, dec_mark = ",", sep_mark = ".")
+    ) %>%
+    fmt_number(
+      columns = c(`PERCENTUAL (%)`),
+      decimals = 2,
+      dec_mark = ",",
+      sep_mark = "."
+    ) %>%
+    grand_summary_rows(
+      columns = c(`PERCENTUAL (%)`),
+      fns = list(label = "TOTAL", id = "totals", fn = "sum"),
+      fmt = ~fmt_number(., decimals = 2, dec_mark = ",", sep_mark = ".")
+    ) %>%
+    tab_source_note(
+      source_note = "Fonte: DTI/DETRAN-PA"
+    ) %>%
+    gt::tab_options(
+      table.width = pct(80),
+      latex.use_longtable = TRUE
+    )
+}
+
+```
+
+
+
+
+
+\newpage
+# **INTRODUÇÃO**
+
+O desenvolvimento da indústria automobilística brasileira sempre esteve entrelaçado às diretrizes da política industrial nacional, especialmente alicerçado no modelo desenvolvimentista das décadas de 1950 e 1960. Esse modelo promoveu a produção em massa de veículos como estratégia para fortalecer economicamente o país, consolidando o transporte individual motorizado como eixo central da mobilidade urbana (ROLIM, 2019).\vskip0.3cm
+
+Desde o governo de Juscelino Kubitschek, as políticas de atração de investimentos e construção de infraestrutura logística, juntamente com a atuação da Comissão Executiva de Indústria Automobilística (GEIA), impulsionaram a instalação de montadoras estrangeiras no Brasil, acelerando a industrialização automobilística e estimulando a motorização urbana (NASCIMENTO, 2016).\vskip0.3cm
+
+Nas últimas décadas, as motocicletas passaram a exercer um papel de destaque na dinâmica urbana, especialmente em municípios de médio e grande porte. Com sua facilidade de aquisição, manutenção mais acessível e maior agilidade nos deslocamentos, esse tipo de veículo ganhou ampla adesão, tornando-se uma resposta prática da população frente à ineficiência dos sistemas de transporte público e à crescente demanda por deslocamentos rápidos. Entretanto, o crescimento acelerado da frota de motocicletas também trouxe novos desafios para a gestão do trânsito, especialmente no que diz respeito à segurança viária e à elevação dos índices de sinistros com vítimas.\vskip0.3cm
+
+No Estado do Pará, observa-se um cenário de intensificação desse processo. A demanda crescente por mobilidade e a progressiva diversificação da frota veicular têm gerado impactos substanciais na estrutura urbana e nos fluxos de deslocamento. A heterogeneidade da frota — composta por automóveis, motocicletas, caminhões, ônibus e veículos alternativos — evidencia a complexidade do sistema de transporte estadual, que exige uma abordagem integrada e multidisciplinar para seu gerenciamento eficaz (LUCENA, 2017).\vskip0.3cm
+
+No cenário atual, no qual o planejamento e a gestão do município apresentam-se processos que exigem um diagnóstico global e continuado da realidade local, que acompanhem e interpretem a dinâmica municipal em seus diversos aspectos social, econômico e ambiental, a informação desagregada é de fundamental importância para planejadores e gestores de um modo geral. Disponibilizar informações municipalizadas permite aos governos disporem de instrumentos adequados para uma gestão descentralizada. \vskip0.3cm
+
+A análise da frota veicular torna-se uma ferramenta essencial para o planejamento urbano e a formulação de políticas públicas. A partir dos dados disponibilizados pelo Registro Nacional de Veículos Automotores (RENAVAM), mantido pelo Departamento de Trânsito do Estado do Pará (DETRAN-PA), é possível compreender a evolução e a distribuição da frota nas diferentes regiões de integração do estado. Essas informações, quando analisadas de forma sistemática, permitem a identificação de padrões, tendências e áreas críticas, servindo de subsídio para intervenções mais eficientes (OLIVEIRA, 2017).\vskip0.3cm
+
+O presente estudo tem como objetivo examinar a evolução da frota de veículos no Pará, com foco especial nas disparidades regionais e na concentração de veículos por área geográfica. A partir dessa análise, busca-se oferecer uma contribuição relevante ao debate sobre a mobilidade urbana sustentável, propondo reflexões que possam subsidiar ações governamentais voltadas à melhoria da qualidade de vida da população. Ao compreender a dinâmica de crescimento da frota veicular, espera-se fomentar a construção de um sistema de transporte mais eficiente, equitativo e ambientalmente responsável.\vskip0.3cm
+
+Nesse cotexto, a elaboração do Boletim Estatístico vem ao encontro do dispositivo na **Lei de Acesso à Informação (LAI)**, na **Instrução Normativa SLTI nº 04, de 13 de abril de 2012** (que institui a Infraestrutura Nacional de Dados Abertos), no Decreto nº 8.777, de 11 de maio de 2016 (que institui a Política de Dados Abertos), bem como dos compromissos assumidos pelo Brasil no âmbito do Plano de Ação Nacional de Governo Aberto.
+
+
+
+\newpage
+# **GLOSSÁRIO** 
+
+O monitoramento da frota veicular é uma etapa estratégica no planejamento do trânsito e da mobilidade urbana. Para assegurar a correta interpretação dos dados apresentados neste boletim, é fundamental compreender os conceitos técnicos utilizados pelo Registro Nacional de Veículos Automotores (RENAVAM), conforme as diretrizes da Secretaria Nacional de Trânsito (SENATRAN).
+
+## Classificação dos Veículos quanto ao Tipo
+
+A tipologia veicular constitui o alicerce da taxonomia do trânsito brasileiro. Normatizada pela Secretaria Nacional de Trânsito (SENATRAN-2025) e refletida na base RENAVAM, essa classificação transcende a mera descrição física; ela categoriza os veículos segundo sua arquitetura construtiva, funcionalidade precípua e impacto potencial sobre a malha viária. A compreensão da distribuição desses tipos é imperativo para o dimensionamento de políticas de engenharia de tráfego, a regulação de fluxos de carga versus passageiros e a modelagem de cenários de mobilidade urbana.\vskip0.3cm
+
+Abaixo, apresentam-se as definições técnicas das principais categorias que compõem o espectro da frota analisada, conforme diretrizes do Código de Trânsito Brasileiro (CTB). \vskip0.3cm
+
+
+```{=latex}
+
+\begin{description}[style=nextline, leftmargin=1.5cm, font=\normalfont\bfseries]
+
+\item[\faCarSide \hspace{0.5em} Automóvel]
+Veículo automotor de quatro rodas projetado para o transporte individual ou familiar de passageiros, com capacidade limitada a oito ocupantes, excluindo o condutor.
+
+\item[\faBicycle \hspace{0.5em} Bicicleta]
+Veículo de propulsão humana, dotado de duas rodas, não similar a ciclomotores, motocicletas ou motonetas, sendo equiparado aos veículos para efeitos de circulação viária.
+
+\item[\faSubway \hspace{0.5em} Bonde]
+Veículo de propulsão elétrica que se move sobre trilhos, destinado ao transporte urbano de passageiros.
+
+\item[\faTruckMoving \hspace{0.5em} Caminhão]
+Veículo automotor destinado exclusivamente ao transporte de carga, com Peso Bruto Total (PBT) superior a 3.500 kg, podendo tracionar ou arrastar outro veículo.
+
+\item[\faTruckPickup \hspace{0.5em} Caminhonete]
+Veículo destinado ao transporte de carga com Peso Bruto Total (PBT) de até 3.500 kg, caracterizado pela presença de caçamba aberta ou fechada.
+
+\item[\faShuttleVan \hspace{0.5em} Camioneta]
+Veículo de uso misto, projetado para o transporte simultâneo de passageiros e carga no mesmo compartimento.
+
+\item[\faMotorcycle \hspace{0.5em} Ciclomotor]
+Veículo de duas ou três rodas, provido de motor de combustão interna cuja cilindrada não exceda 50 cm³ e cuja velocidade máxima de fabricação não seja superior a 50 km/h.
+
+\item[\faMotorcycle \hspace{0.5em} Motocicleta]
+Veículo automotor de duas rodas, com ou sem sidecar, dirigido por condutor em posição montada (montaria).
+
+\item[\faMotorcycle \hspace{0.5em} Motoneta]
+Veículo automotor de duas rodas, dirigido por condutor em posição sentada, caracterizado usualmente por plataforma para os pés e câmbio automático ou semiautomático (ex: scooters).
+
+\item[\faShuttleVan \hspace{0.5em} Micro-ônibus]
+Veículo automotor de transporte coletivo de passageiros, projetado com capacidade para acomodar até 20 passageiros sentados.
+
+\item[\faBus* \hspace{0.5em} Ônibus]
+Veículo automotor de transporte coletivo de passageiros, projetado com capacidade superior a 20 passageiros sentados, podendo ser urbano, rodoviário ou articulado.
+
+\item[\faTram \hspace{0.5em} Reboque e Semi-reboque]
+Veículo de carga sem propulsão própria, destinado a ser engatado atrás de um veículo automotor trator.
+
+\item[\faTractor \hspace{0.5em} Trator de Rodas]
+Veículo automotor projetado para tracionar ou arrastar maquinaria agrícola, industrial ou de construção, não destinado primariamente à circulação em vias públicas.
+
+\item[\faBiking \hspace{0.3em} \faPlus \hspace{0.3em} Triciclo]
+Veículo automotor de três rodas, com estrutura de motocicleta ou cabine fechada, não classificado como ciclomotor.
+
+\item[\faCar \hspace{0.3em} \faPlus \hspace{0.3em} Quadriciclo]
+Veículo automotor de quatro rodas, de estrutura aberta ou fechada, com limites específicos de peso e potência definidos pelo CONTRAN, utilizado majoritariamente em vias não pavimentadas ou para lazer.
+
+
+\end{description}
+```
+
+
+\newpage
+
+## Classificação dos Veículos quanto a Espécie
+
+A classificação por espécie constitui a taxonomia funcional da frota, agrupando os veículos conforme a sua natureza operativa e finalidade de uso. Esta variável é determinante para a formulação de diagnósticos sobre a dinâmica econômica local, permitindo distinguir entre o parque veicular destinado à mobilidade humana e aquele voltado ao suporte logístico e produtivo. Sob o prisma da gestão do DETRAN-PA, a análise da espécie é fundamental para o dimensionamento de fiscalizações específicas e para a compreensão das demandas de infraestrutura urbana e rural.\vskip0.3cm
+
+
+Abaixo, detalham-se as espécies veiculares conforme as diretrizes do Artigo 96 do Código de Trânsito Brasileiro:\vskip0.3cm
+
+
+```{=latex}
+
+\begin{description}[style=nextline, leftmargin=1.5cm, font=\normalfont\bfseries]
+
+\item[\faUsers \hspace{0.5em} Passageiro]
+Veículo projetado e destinado primordialmente ao translado de pessoas. Abrange desde ciclomotores até ônibus articulados, sendo o principal indicador da pressão sobre o sistema de mobilidade urbana individual e coletiva.
+
+\item[\faBoxes \hspace{0.5em} Carga]
+Veículo estruturado especificamente para o transporte de mercadorias, insumos ou bens. Esta categoria é um termômetro da atividade logística e da capilaridade comercial de \textbf{`r params$cidade_selecionada`}.
+
+\item[\faSync \hspace{0.5em} Misto]
+Veículo que apresenta arquitetura polivalente, permitindo o transporte simultâneo de carga e passageiros em um compartimento comum (ex: camionetas). Representa a versatilidade no uso do espaço viário.
+
+\item[\faCogs \hspace{0.5em} Tração]
+Unidade motriz cuja função precípua é prover energia cinética para tracionar ou arrastar outros veículos (como reboques e semi-reboques) ou implementos agrícolas e industriais.
+
+\item[\faStar \hspace{0.5em} Especial]
+Veículo que, por meio de modificações estruturais ou equipamentos acoplados, destina-se a funções singulares e não convencionais (ex: unidades móveis de saúde, guindastes, veículos de salvamento ou publicidade).
+
+\item[\faHistory \hspace{0.5em} Coleção]
+Veículo fabricado há mais de 30 anos, que preserva suas características originais de fábrica e possui valor histórico e cultural reconhecido, detentor de certificado de originalidade e placa específica.
+
+\item[\faFlagCheckered \hspace{0.5em} Competição]
+Veículo concebido exclusivamente para performance esportiva em circuitos fechados ou eventos autorizados, dotado de modificações técnicas que frequentemente restringem sua circulação em vias públicas convencionais.
+
+\end{description}
+```
+
+
+\newpage
+
+## Classificação dos Veículos quanto a Categoria
+
+A categoria veicular define o estatuto jurídico e o regime de exploração ao qual o veículo está vinculado. Esta classificação é o principal balizador para a aplicação de políticas de tributação (IPVA), fiscalização de trânsito e identificação visual (padrão de placas). Para a gestão pública em municipal, mapear a proporção entre veículos particulares, oficiais e de aluguel é essencial para compreender a dinâmica entre o transporte privado, o setor de serviços e a frota estatal, permitindo um planejamento mais assertivo sobre o uso do espaço viário e a arrecadação municipal. \vskip0.3cm
+
+Abaixo, descrevem-se as categorias estabelecidas pelo Código de Trânsito Brasileiro (CTB) e regulamentações do CONTRAN: \vskip0.3cm
+
+
+```{=latex}
+
+\begin{description}[style=nextline, leftmargin=1.5cm, font=\normalfont\bfseries]
+
+\item[\faUser \hspace{0.5em} Particular]
+Veículo de propriedade de pessoa física ou jurídica destinado ao uso privado e sem fins lucrativos diretos na atividade de transporte. Representa a maior parcela da frota urbana, sendo o motor da mobilidade individual.
+
+\item[\faGavel \hspace{0.5em} Oficial]
+Veículos pertencentes à administração pública direta, autárquica e fundacional de qualquer dos poderes da União, dos Estados, do Distrito Federal e dos Municípios. São destinados estritamente ao serviço público e detêm prerrogativas específicas de identificação.
+
+\item[\faHandHoldingUsd \hspace{0.5em} Aluguel]
+Veículos utilizados para a prestação de serviços a terceiros mediante remuneração (ex: táxis, transporte escolar, caminhões de frete e locadoras). Esta categoria é vital para a economia de serviços e logística de \textbf{`r params$cidade_selecionada`}.
+
+\item[\faGraduationCap \hspace{0.5em} Aprendizagem]
+Veículos destinados exclusivamente à instrução prática de candidatos à habilitação, devendo estar devidamente equipados com comandos duplos e identificação específica, conforme normas dos Centros de Formação de Condutores (CFCs).
+
+\item[\faPassport \hspace{0.5em} Representação Diplomática / Consular]
+Veículos utilizados por missões diplomáticas, repartições consulares de carreira, organismos internacionais acreditados junto ao Governo Brasileiro e seus funcionários estrangeiros, gozando de imunidades e privilégios previstos em tratados internacionais.
+
+\item[\faHardHat \hspace{0.5em} Experiência / Fabricante]
+Categoria temporária destinada a veículos em fase de testes, homologação ou demonstração por parte de fabricantes e oficinas, permitindo a circulação sob condições restritas para fins de desenvolvimento técnico.
+
+\end{description}
+```
+
+
+\newpage
+
+## Classificação dos Veículos quanto ao Tipo de Combustível
+
+A análise da matriz energética da frota veicular é um indicador estratégico para a gestão ambiental e para o planejamento da sustentabilidade urbana nos municípios. Esta variável não apenas identifica a dependência de fontes fósseis ou renováveis, mas também fornece subsídios para o cálculo da pegada de carbono do setor de transportes e para a projeção de infraestrutura necessária à transição energética (como redes de abastecimento de GNV ou eletropostos).\vskip0.3cm 
+
+Conforme os registros do RENAVAM, as categorias de propulsão são definidas pela natureza físico-química do combustível e pela tecnologia de combustão do motor: \vskip0.3cm 
+
+
+```{=latex}
+
+\begin{description}[style=nextline, leftmargin=1.5cm, font=\normalfont\bfseries]
+
+\item[\faGasPump \hspace{0.5em} Gasolina]
+Combustível fóssil de alta densidade energética, derivado do petróleo. É o principal vetor de mobilidade para veículos leves, apresentando ampla infraestrutura de distribuição, mas com impacto direto na emissão de gases de efeito estufa.
+
+\item[\faLeaf \hspace{0.5em} Álcool (Etanol)]
+Biocombustível renovável produzido majoritariamente a partir da cana-de-açúcar. Caracteriza-se por uma pegada de carbono reduzida em seu ciclo de vida (do campo ao escapamento) e é pilar central da tecnologia \textit{flex-fuel} brasileira.
+
+\item[\faTruck \hspace{0.5em} Diesel]
+Hidrocarboneto fóssil destinado primordialmente a motores de ignição por compressão (ciclo Diesel). É o combustível vital para o transporte de carga e passageiros de grande porte, devido ao seu elevado torque e eficiência térmica, embora exija controle rigoroso de óxidos de nitrogênio (NOx).
+
+\item[\faBurn \hspace{0.5em} GNV (Gás Natural Veicular)]
+Mistura de hidrocarbonetos leves mantida sob alta pressão. Apresenta-se como uma alternativa de menor custo operacional e menor emissão de particulados quando comparado aos combustíveis líquidos convencionais, dependendo de infraestrutura de compressão dedicada.
+
+\item[\faPlug \hspace{0.5em} Elétrico]
+Veículo cuja propulsão é alimentada exclusivamente por energia elétrica armazenada em baterias recarregáveis. Representa o estado da arte da mobilidade sustentável, com emissão zero de poluentes no local de operação e alta eficiência energética.
+
+\item[\faSeedling \hspace{0.3em} \faBolt \hspace{0.3em} Híbrido]
+Tecnologia sinérgica que combina um motor de combustão interna (gasolina ou etanol) com um ou mais motores elétricos. Otimiza o consumo e reduz emissões ao alternar as fontes de energia conforme a demanda de torque e velocidade.
+
+\item[\faQuestionCircle \hspace{0.5em} Outros / Não Informado]
+Abrange fontes alternativas menos frequentes (como biodiesel puro ou gásogênio) ou registros administrativos cujos dados de propulsão não foram discriminados no momento do licenciamento.
+
+\end{description}
+```
+
+
+
+\newpage
+
+## Classificação dos Veículos quanto a Nacionalidade
+
+A distinção da frota segundo a sua nacionalidade é um indicador da integração do município às cadeias globais de valor e aos ciclos da política industrial brasileira. Esta variável reflete não apenas a origem geográfica da manufatura, mas também a maturidade do parque fabril instalado no país, os impactos das flutuações cambiais no mercado automotivo e a configuração das redes de assistência técnica e reposição de componentes. Sob a ótica do planejamento, a predominância de veículos nacionais ou importados condiciona estratégias de fiscalização e modelos de tributação. \vskip0.3cm
+
+Conforme a base de dados do RENAVAM, a procedência dos veículos é categorizada em: \vskip0.3cm
+
+
+```{=latex}
+
+\begin{description}[style=nextline, leftmargin=1.5cm, font=\normalfont\bfseries]
+
+\item[\faFlag \hspace{0.5em} Nacional]
+Veículo produzido em território brasileiro, abrangendo tanto as unidades fabricadas integralmente no país quanto aquelas montadas sob regime de CKD (\textit{Completely Knocked Down}) por montadoras instaladas no Brasil. Representa a força da indústria interna, o fomento ao emprego local e a maior facilidade de manutenção devido à capilaridade das peças de reposição nacionais.
+
+\item[\faShip \hspace{0.5em} Importado]
+Veículo fabricado no exterior e introduzido no mercado brasileiro por meio de importação direta ou via redes de concessionárias autorizadas. Frequentemente associado à introdução de tecnologias disruptivas e modelos de alta performance, esta categoria é sensível a tratados comerciais internacionais e barreiras tarifárias, exigindo redes de serviço especializadas.
+
+\end{description}
+```
+
+
+
+\newpage
+
+## Classificação dos Veículos quanto a Cor
+
+A cromaticidade veicular, embora frequentemente percebida sob uma ótica puramente estética, constitui um elemento essencial de identificação obrigatória e segurança viária. A cor predominante, registrada no Certificado de Registro e Licenciamento de Veículo (CRLV), atua como um descritor crítico para fins de fiscalização, rastreabilidade em investigações de sinistros e monitoramento por sistemas de videovigilância. Além disso, a distribuição cromática da frota em alguns municípios reflete padrões climáticos (preferência por cores térmicas), tendências de mercado e valor de revenda. \vskip0.3cm
+
+Abaixo, detalham-se as principais classificações cromáticas e suas implicações no contexto do trânsito: \vskip0.3cm
+
+
+```{=latex}
+
+\begin{description}[style=nextline, leftmargin=1.5cm, font=\normalfont\bfseries]
+
+\item[\faSun \hspace{0.5em} Branca]
+Matriz de alta refletância lumínica, amplamente adotada por sua neutralidade térmica e facilidade de manutenção. É a cor de maior visibilidade em condições de baixa luminosidade, contribuindo passivamente para a segurança viária.
+
+\item[\faMoon \hspace{0.5em} Preta]
+Cor de alta absorção térmica e baixa visibilidade noturna. Historicamente associada a veículos de luxo e representação, exige maior rigor na manutenção estética e sistemas de iluminação eficientes para garantir o contraste viário.
+
+Do Ponto de vista da Pasicologia das cores (STRACHNYI, 2023), o preto não está no círculo cromático e não é considerado uma cor em termos técnicos, pois trata-se da absorção de todas as cores. No entanto, é bastante usado em míltiplas formas de visualização e é considerado uma cor no sentido do design. Ele tem uma das gamas mais amplas de emoções associadas a ele, transmitindo percepções de poder, mistério, ousadia e tristeza. Empresas de automóveis frequentemente o usam para promover elegância e sofisticação.
+
+\item[\faCloud \hspace{0.5em} Cinza / Prata]
+Categorias que dominam o mercado automobilístico brasileiro pela "neutralidade de revenda". O cinza e o prata oferecem um equilíbrio entre estética e discrição, sendo as cores mais resilientes à percepção de sujidade e pequenos danos superficiais.
+
+\item[\faTint \hspace{0.5em} Vermelha]
+Matriz vibrante frequentemente associada a veículos de emergência (corpo de bombeiros) ou modelos esportivos. Possui forte apelo visual, facilitando a identificação imediata do veículo em fluxos intensos.
+
+\item[\faPalette \hspace{0.5em} Azul / Verde / Amarelo / Outras]
+Cores que compõem a diversidade cromática da frota. O amarelo, em particular, detém importância regulatória para veículos de transporte escolar e serviços de manutenção de via devido ao seu alto índice de percepção humana.
+
+\item[\faMagic \hspace{0.5em} Fantasia]
+Classificação aplicada a veículos que ostentam mais de duas cores predominantes, frequentemente utilizada em viaturas oficiais, carros de propaganda ou envelopamentos personalizados que alteram a identidade visual original do fabricante.
+
+\end{description}
+```
+
+
+Em suma, a alteração da cor do veículo sem comunicação ao DETRAN configura infração grave, conforme o Art. 230, inciso VII, do CTB, sujeita a multa, pontos na CNH e retenção do veículo para regularização.
+
+A padronização no registro das cores contribui para a rastreabilidade de veículos, análise de preferências regionais e estudos sobre a relação entre cor, visibilidade e segurança viária.
+
+
+\newpage
+
+# **MATERIAL E MÉTODOS**
+## Procedimentos de Engennharia de Dados
+
+A elaboração deste boletim estatístico fundamenta-se nos princípios da Programação Literária (*Literate Programming*), abordagem metodológica que integra, de forma indissociável, a narrativa técnica e o código computacional executável em um único fluxo de produção. Essa estratégia assegura transparência metodológica, reprodutibilidade das análises e rastreabilidade dos resultados, requisitos essenciais para a produção de informação estatística qualificada no âmbito da administração pública.\vskip0.3cm
+
+O tratamento dos dados seguiu uma arquitetura estruturada de *pipeline* analítico, concebida para garantir consistência estatística, controle de qualidade e flexibilidade analítica em todas as fases do processo. Esse pipeline foi organizado em quatro estágios fundamentais, descritos a seguir.
+
+
+### Extração e Validação dos Dados
+
+Na etapa inicial, os dados administrativos provenientes do Registro Nacional de Veículos Automotores (RENAVAM) foram extraídos a partir de bases oficiais consolidadas, respeitando rigorosamente os recortes temporais e territoriais definidos na parametrização do boletim. A validação consistiu na verificação da integridade estrutural dos arquivos, assegurando a conformidade dos tipos de variáveis, formatos de datas e codificações categóricas adotadas. \vskip0.3cm
+
+Adicionalmente, foram realizados procedimentos sistemáticos de controle de qualidade voltados à identificação de registros incompletos, valores fora do domínio esperado e inconsistências lógicas entre variáveis correlatas. Essas rotinas permitiram assegurar a confiabilidade da base bruta (*raw data*), reduzindo riscos de vieses e erros sistemáticos nas etapas subsequentes da análise.
+
+
+###  Padronização e Limpeza das Variáveis
+
+A etapa de limpeza concentrou-se na harmonização semântica e sintática das variáveis, condição indispensável para análises estatísticas consistentes e comparáveis. Foram aplicados procedimentos de padronização das categorias tais como espécie, tipo, combustível, categoria, nacionalidade e demais classificações veiculares incluindo correção de divergências ortográficas, unificação de rótulos equivalentes e consolidação de categorias redundantes. \vskip0.3cm
+
+Os valores ausentes foram tratados conforme sua natureza, frequência e impacto analítico, por meio de exclusão controlada ou reclassificação em categorias específicas, sempre que estatisticamente justificável. A identificação e remoção de registros duplicados assegurou a unicidade das observações, mitigando vieses de superestimação nos indicadores agregados.
+
+
+### Transformação e Agregação Estatística 
+
+Com a base de dados validada e limpa, procedeu-se à transformação das informações em estruturas analíticas apropriadas. Esta etapa envolveu a criação de variáveis derivadas, reclassificação de categorias e aplicação de funções de agregação estatística, tais como contagens absolutas, proporções relativas e percentuais. \vskip0.3cm
+
+As agregações foram realizadas de acordo com os recortes analíticos definidos na parametrização do boletim, possibilitando análises por município, período, espécie, tipo, categoria, combustível e demais dimensões relevantes. Essa abordagem resultou na construção de bases analíticas flexíveis, aptas à exploração estatística, visualização gráfica e geração de indicadores sintéticos.
+
+
+### Geração Automática de Tabelas, Gráficos e Indicadores
+
+Na etapa final, os dados agregados foram utilizados para a geração automatizada dos produtos analíticos do boletim, incluindo tabelas estatísticas, gráficos informativos e indicadores sintéticos. Todo o processo foi conduzido por meio de rotinas reprodutíveis integradas ao fluxo de Programação Literária, assegurando que qualquer alteração na parametrização como período de análise ou unidade territorial selecionada resultasse na atualização automática e consistente de todo o conteúdo analítico. \vskip0.3cm
+
+Os produtos finais foram padronizados quanto à formatação, rotulagem, escalas e apresentação visual, garantindo clareza interpretativa, coerência institucional e aderência às boas práticas de comunicação estatística adotadas em relatórios técnicos oficiais.
+
+
+## Infraestrutura Tecnógica 
+
+O ecossistema computacional adotado neste estudo baseia-se na utilização da linguagem (\faRProject, versão 4.5), operada em ambiente de desenvolvimento integrado (*Integrated Development Environment – IDE*) Rstudio *Desktop*. Essa infraestrutura permite a implementação de rotinas estatísticas avançadas, visualizações de alta qualidade e automatização de relatórios técnicos. \vskip0.3cm  
+
+A conversão do código-fonte em produto final no formato \faFilePdf \ é realizada por meio do motor de tipografia chamado \LaTeX{}, assegurando elevado padrão de editoração, consistência visual e conformidade com exigências técnicas e institucionais da administração pública. A adoção dessa cadeia tecnológica garante que o boletim seja simultaneamente computacionalmente reprodutível, tecnicamente auditável e editorialmente qualificado.\vskip0.3cm
+
+
+## Aspectos Legais e Fundamentação Normativa
+
+A produção estatística apresentada neste boletim transende o caráter meramente técnico-administrativo, configurando-se como instrumento concreto de efetivação dos princípios constitucionais da publicidade, da eficiência e da transparência ativa na gestão pública. A transformação de dados brutos do RENAVAM em informação estatística qualificada constitui um pilar da Governança Pública Moderna, ao viabilizar o controle social e a tomada de decisão orientado por evidências.\vskip0.3cm  
+
+A fundamentação jurídica do presente documento apoia-se em um arcabouço normativo consolidade, que assegura legitimidade institucional, segurança jurídica e padronização técnica às análises realizadas. \vskip0.3cm
+
+
+```{=latex}
+
+\begin{description}[style=nextline, leftmargin=1.5cm, font=\normalfont\bfseries]
+
+\item[\faGavel \hspace{0.5em} Código de Trânsito Brasileiro (Lei nº 9.503/1997)] O Código de Trânsito Brasileiro estabelece, em seu Art. 1º, que o trânsito em condições seguras é um direito de todos e um dever dos órgãos do Sistema Nacional de Trânsito. O Art. 320 determina que a receita arrecada com multas deve ser aplicada, entre outros finalidades, em ações de engenharia, educação e controle estatístico do trânsito, conferido respaldo legal às análises aqui apresentadas.
+
+\end{description}
+```
+
+
+\newpage
+
+```{=latex}
+
+\begin{description}[style=nextline, leftmargin=1.5cm, font=\normalfont\bfseries]
+
+\item[\faUnlock \hspace{0.5em} Lei de Acesso à Informação (Lei nº 12.527/2011)] A Lei de Acesso à Informação consagra a transparência como regra e o sigilo como exceção. Este boletim materializa a transparência ativa ao disponibilizar, de forma estruturada e acessível, informações estatísticas sobre a frota veicular, antecipando-se às demandas da sociedade e fortalecimento a accountability pública.
+
+\item[\faClipboardCheck \hspace{0.5em} Resolução CONTRAN nº 989/2022] A referida resolução estabelece diretrizes para a padronização e sistematização dos dados de veículos e condutores em âmbito nacional. A observância dessa norma assegura interoperabilidade técnica e comparabilidade dos dados, permitindo análises consistentes entre municípios, estados e regiões do país.
+
+\item[\faShieldVirus \hspace{0.5em} Lei Geral de Proteção de Dados (Lei nº 13.709/2018)] Todo o tratamento estatístico realizado observa rigorosamente os princípios da LGPD. Os dados utilizados foram submetidos a processos de anonimização e agregação, garantido que a divulgação de informações públicas não comprometa a privacidade de proprietários ou condutores individualmente identificáveis.
+
+\end{description}
+```
+
+
+
+Dessa forma, a metodologia adotada e a análise técnica desenvolvida nas seções subsequentes cumprem uma função social estratégica ao subsidiar o planejamento viário, a formulação de políticas públicas e a tomada de decisão baseada em evidências. O alinhamento entre ciência de dados, normatividade jurídica e gestão pública posiciona o **DETRAN-PA** em consonância com as melhores práticas nacionais e internacionais de cidades inteligentes e mobilidade orientada por dados.
+
+
+\newpage
+
+# **PERFIL ESTATÍSTICO DOS MUNICÍPIOS**
+## Licenciamento de Veículos por Ano
+
+
+O licenciamento anual de veículos automotores é uma exigência legal prevista no **Art. 130** do **Código de Trânsito Brasileiro (CTB)**, que condiciona a circulação regular do veículo nas vias públicas à sua devida regularização. Esse processo é de competência dos órgãos executivos estaduais de trânsito, regulamentado pelo **CONTRAN** e pela **Secretaria Nacional de Trânsito (SENATRAN)**. \vskip0.3cm
+
+A análise da evolução temporal do licenciamento veicular em `r params$cidade_selecionada` permite avaliar, de forma indireta, a dinâmica de crescimento da frota, o comportamento regulatório dos proprietários e os reflexos de fatores econômicos, institucionais e urbanos. Os dados utilizados nesta seção têm origem no RENAVAM, consolidados pelo DETRAN-PA. Consideram-se apenas **anos com registros completos**, sendo o ano corrente tratado de forma exclusivamente descritiva. \vskip0.3cm
+
+
+
+```{r}
+# Ano atual
+# Ano atual
+
+ano_atual <- as.integer(format(Sys.Date(), "%Y"))
+
+# ================================
+# BASE ANALÍTICA (anos completos)
+# ================================
+
+dados_ano_analise <- df_filtrado %>%
+filter(ano_ajust < ano_atual) %>%
+count(ano_ajust, name = "FREQUENCIA") %>%
+arrange(ano_ajust) %>%
+mutate(
+PERCENTUAL = FREQUENCIA / sum(FREQUENCIA) * 100,
+VARIACAO = round(100 * (FREQUENCIA - lag(FREQUENCIA)) / lag(FREQUENCIA), 1)
+)
+
+# Indicadores
+
+ano_inicial <- min(dados_ano_analise$ano_ajust)
+ano_final   <- max(dados_ano_analise$ano_ajust)
+
+total <- sum(dados_ano_analise$FREQUENCIA)
+media_anos_completos <- mean(dados_ano_analise$FREQUENCIA)
+
+pico_max <- dados_ano_analise |> slice_max(FREQUENCIA, n = 1)
+pico_min <- dados_ano_analise |> slice_min(FREQUENCIA, n = 1)
+
+maior_cresc <- dados_ano_analise |> slice_max(VARIACAO, n = 1)
+maior_queda <- dados_ano_analise |> slice_min(VARIACAO, n = 1)
+```
+
+
+Entre os anos de **`r ano_inicial`** e **`r ano_final`**, período com dados anuais completos, o município de `r params$cidade_selecionada` registrou um total de **`r format(total, big.mark='.')`** licenciamentos veiculares, resultando em uma média anual aproximada de `r format(media_anos_completos, big.mark='.')` registros. Esse volume médio evidencia um patamar consistente de regularização da frota ao longo do período analisado. \vskip0.3cm
+
+O maior volume anual de licenciamentos ocorreu em **`r pico_max$ano_ajust`**, com **`r format(pico_max$FREQUENCIA, big.mark='.')`** registros, correspondendo a aproximadamente **`r round(pico_max$PERCENTUAL, 1)`\% ** do total do período. Esse desempenho coincide, também, com a maior variação positiva anual (**`r round(maior_cresc$VARIACAO,1)`\% **), sugerindo a ocorrência de fatores excepcionais, tais como campanhas de regularização, mutirões administrativos, melhorias operacionais nos sistemas de atendimento ou alterações normativas que estimularam a adesão dos proprietários. Em contraposição, o menor volume anual de licenciamentos foi observado em **`r pico_min$ano_ajust`**, com **`r format(pico_min$FREQUENCIA, big.mark='.')`** registros, representando cerca de `r round(pico_min$PERCENTUAL,1)`\% do total analisado. \vskip0.3cm
+
+
+`r ifelse(
+  is.na(maior_queda$VARIACAO),
+  "Não foi possível identificar variação anual suficiente para caracterizar retração ou desaceleração no período analisado.",
+  ifelse(
+    maior_queda$VARIACAO < 0,
+    paste0(
+      "A maior retração anual ocorreu em ", maior_queda$ano_ajust,
+      ", com uma redução de ",
+      abs(round(maior_queda$VARIACAO, 1)),
+      "\\% em relação ao ano anterior, refletindo um contexto de desaceleração possivelmente associado a restrições econômicas, limitações operacionais ou eventos extraordinários de impacto sistêmico."
+    ),
+    paste0(
+      "No entanto, não se observou retração absoluta no período analisado. O ano de ",
+      maior_queda$ano_ajust,
+      " apresentou a menor taxa de crescimento anual (",
+      round(maior_queda$VARIACAO, 1),
+      "\\%), caracterizando uma desaceleração relativa no ritmo de expansão dos licenciamentos."
+    )
+  )
+)` 
+
+
+```{r}
+#| label: tbl-ANO
+#| tbl-cap: !expr paste("Distribuição dos Licenciamentos de Veículos Registrados por Ano no município de", params$cidade_selecionada)
+
+library(gt) # Garantia de que o pacote de tabelas está ativo aqui
+
+df_filtrado %>%
+  count(ano_ajust, name = "FREQUÊNCIA") %>%
+  arrange(ano_ajust) %>%
+  mutate(
+    `%` = FREQUÊNCIA / sum(FREQUÊNCIA) * 100,
+    `FREQ. ACUMULADA` = cumsum(FREQUÊNCIA),
+    `ACUMULADO (%)` = cumsum(`%`)
+  ) %>%
+  gt(rowname_col = "ano_ajust") %>%
+  cols_align("center") %>%
+  tab_stubhead(label = "ANO") %>%
+  fmt_number(
+    columns = c(FREQUÊNCIA, `FREQ. ACUMULADA`),
+    decimals = 0, dec_mark = ",", sep_mark = "."
+  ) %>%
+  fmt_number(
+    columns = c(`%`, `ACUMULADO (%)`),
+    decimals = 2, dec_mark = ",", sep_mark = "."
+  ) %>%
+  gt::tab_options(
+    table.width = gt::pct(80),
+    table.font.size = "13px"
+  )
+
+
+```
+
+
+
+\newpage
+
+```{r}
+#| label: fig-Licenciamento-Tendencia
+#| fig-cap: !expr paste("Evolução dos Licenciamentos Veicular no município de", params$cidade_selecionada)
+#| fig-width: 12
+#| fig-height: 8
+#| fig-dpi: 300
+
+library(ggplot2)
+library(scales)
+
+ggplot(dados_ano_analise, aes(x = ano_ajust)) +
+  geom_col(
+  aes(
+    y = ifelse(
+      is.na(VARIACAO), 0,
+      ifelse(VARIACAO == 0, 0.01, VARIACAO)
+    ),
+    fill = VARIACAO < 0
+  ),
+  color = "grey30",      # borda discreta
+  linewidth = 0.4,       # sólida, mas não dominante
+  show.legend = FALSE
+)+
+  scale_fill_manual(
+    values = c("TRUE" = "#ff5330", 
+               "FALSE" = "#1f77b4")
+  ) +
+  geom_hline(
+    yintercept = 0,
+    color = "grey40",
+    linewidth = 0.7
+  ) +
+  scale_y_continuous(
+    name = "Variação Percentual (%)"
+  ) +
+  scale_x_continuous(
+    breaks = dados_ano_analise$ano_ajust
+  ) +
+  labs(
+    x = "",
+    title = "",
+    subtitle = ""
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  geom_text(
+    aes(
+      y = VARIACAO,
+      label = paste0(round(VARIACAO, 1), "%"),
+      vjust = ifelse(VARIACAO >= 0, -0.4, 1.3)
+    ),
+    size = 5
+  ) +
+  geom_hline(
+  yintercept = 0,
+  color = "black",
+  linewidth = 0.7
+)+ geom_vline(
+    xintercept = 2020,
+    linetype = "dashed",
+    color = "grey40",
+    linewidth = 0.6
+  ) +
+  annotate(
+    "text",
+    x = 2020,
+    y = max(dados_ano_analise$VARIACAO, na.rm = TRUE) * 0.95,
+    label = "COVID-19",
+    angle = 90,
+    vjust = -0.4,
+    size = 4,
+    fontface = "bold",
+    color = "grey9"
+  )
+```
+
+
+A @fig-Licenciamento-Tendencia apresenta, de forma integrada, a evolução do número anual de licenciamentos veiculares e a respectiva variação percentual ano a ano no município de `r params$cidade_selecionada`, considerando exclusivamente os anos com registros completos. As barras verticais representam a **variação percentual anual**, permitindo identificar períodos de crescimento, desaceleração relativa ou retração do volume de licenciamentos, enquanto a linha contínua indica o **total absoluto de registros por ano**, evidenciando a tendência estrutural da série temporal. \vskip0.3cm
+
+Observa-se que o comportamento da série não é linear, com alternância entre anos de expansão mais acentuada e períodos de menor dinamismo. O maior crescimento percentual anual foi registrado em `r maior_cresc$ano_ajust`, com variação positiva de aproximadamente `r round(maior_cresc$VARIACAO,1)`\%, indicando um aumento expressivo na regularização da frota em relação ao ano anterior. Em contrapartida, `r ifelse(maior_queda$VARIACAO < 0,
+paste0("o ano de ", maior_queda$ano_ajust, " apresentou a maior retração percentual (", abs(round(maior_queda$VARIACAO,1)), "\\%),"),
+paste0("não se observou retração absoluta no período analisado,"))` o que sugere a influência de fatores conjunturais, como condições macroeconômicas, ajustes operacionais ou eventos excepcionais. \vskip0.3cm
+
+A trajetória ascendente da linha de volume absoluto, especialmente nos anos mais recentes, indica que, apesar das oscilações anuais na taxa de crescimento, o número de licenciamentos manteve-se em patamar elevado ao longo do período analisado. Esse padrão sugere uma **tendência estrutural de consolidação da regularização veicular**, reforçando a importância do licenciamento como indicador da dinâmica da frota circulante e como subsídio estratégico para o planejamento das ações dos órgãos de trânsito no âmbito municipal.\vskip0.3cm
+
+O ano de 2020 é destacado no gráfico por corresponder ao período de maior impacto da pandemia da COVID-19, evento que provocou restrições à mobilidade, interrupções administrativas e retração temporária nos registros de licenciamentos, refletindo-se em variação percentual negativa em relação ao ano anterior.
+
+
+\newpage
+## Licenciamento de Veículos por Tipo
+
+A classificação por tipo de veículo segue o padrão estabelecido pela SENATRAN, contemplando categorias como automóveis, motocicletas, caminhões, ônibus, entre outras. Essa segmentação permite caracterizar a composição da frota circulante, identificar a predominância de modais individuais ou coletivos e analisar tendências associadas à dinâmica urbana e econômica do município. \vskip0.3cm
+
+A análise por tipo de veículo é fundamental para subsidiar ações de engenharia de tráfego, sinalização, dimensionamento da infraestrutura viária e planejamento da mobilidade urbana, uma vez que diferentes tipos exercem pressões distintas sobre o sistema viário e apresentam padrões específicos de circulação e risco.
+
+
+
+```{r}
+#| tbl-cap: !expr paste("Distribuição da Frota no município de", params$cidade_selecionada, "por Tipo de Veículos.")
+#| label: tbl-TIPO_VEIC
+
+criar_tabela_frequencia(df_filtrado, tipo_veiculo, "TIPO DE VEÍCULO") %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_grand_summary()
+  )
+```
+
+
+
+```{r}
+#| label: AnaliseResumoTipoVeiculo
+
+# Agrupa por tipo de veículo
+resumo_tipo <- df_filtrado %>%
+  group_by(tipo_veiculo) %>%
+   filter(!is.na(tipo_veiculo)) %>%
+  summarise(
+    TOTAL = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    PERCENTUAL = round(100 * TOTAL / sum(TOTAL), 1)
+  ) %>%
+  arrange(desc(TOTAL))
+
+# Principais tipos
+tipo_mais_freq <- resumo_tipo %>% slice_max(TOTAL, n = 1, with_ties = FALSE)
+tipo_menos_freq <- resumo_tipo %>% slice_min(TOTAL, n = 1, with_ties = FALSE)
+
+
+# Número de categorias distintas
+n_tipos <- nrow(resumo_tipo)
+
+# Cidade
+cidade_analisada <- params$cidade_selecionada
+```
+
+
+A análise por tipo de veículo no município de **`r cidade_analisada`** revelou a presença de **`r n_tipos`** categorias distintas de veículos licenciados ao longo do período analisado. Essa diversidade reflete a heterogeneidade funcional da frota circulante e evidencia diferentes padrões de uso associados às dinâmicas urbanas, econômicas e sociais locais. \vskip0.3cm
+
+O tipo de veículo mais frequente foi **`r tipo_mais_freq$tipo_veiculo`**, concentrando **`r round(tipo_mais_freq$PERCENTUAL, 1)`\%** do total de licenciamentos, o que corresponde a **`r format(tipo_mais_freq$TOTAL, big.mark='.')`** veículos. Esse predomínio indica forte dependência desse modal para deslocamentos cotidianos, atividades produtivas ou transporte de pessoas e mercadorias, reforçando seu papel central na mobilidade urbana do município. \vskip0.3cm
+
+Em contrapartida, o tipo menos representativo foi **`r tipo_menos_freq$tipo_veiculo`**, com apenas **`r format(tipo_menos_freq$TOTAL, big.mark='.')`** registros, equivalentes a **`r tipo_menos_freq$PERCENTUAL` \%** do total. A baixa participação desse tipo pode estar associada a fatores como custo de aquisição, restrições operacionais, menor adequação à malha viária urbana ou utilização em contextos mais especializados. \vskip0.3cm
+
+De forma geral, a distribuição da frota por tipo de veículo fornece subsídios relevantes para o planejamento do trânsito e da mobilidade urbana, contribuindo para o dimensionamento de infraestrutura viária, políticas de segurança, ações de fiscalização e estratégias de incentivo ao uso de modais mais sustentáveis. \vskip0.3cm
+
+
+
+```{r}
+#| label: fig-Tipo-Pareto
+#| fig-cap: !expr paste("Participação Percentual da Frota por Tipo de Veículos no município de", params$cidade_selecionada )
+#| fig-width: 12
+#| fig-height: 7
+#| fig-dpi: 300
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+library(forcats)
+
+
+dados_tipo_plot <- resumo_tipo %>%
+   filter(PERCENTUAL > 0) %>%                     # 🔑 REMOVE CATEGORIAS ZERADAS
+  arrange(desc(TOTAL)) %>%
+  mutate(
+    tipo_veiculo = forcats::fct_reorder(tipo_veiculo, TOTAL),
+    PERC_LABEL = paste0(PERCENTUAL, "%")
+  )
+ggplot(dados_tipo_plot, aes(
+  x = TOTAL,
+  y = tipo_veiculo
+)) +
+  geom_col(
+    fill = "#1f77b4",
+    color = "grey30",
+    linewidth = 0.3
+  ) +
+  geom_text(
+    aes(label = PERC_LABEL),
+    hjust = -0.08,
+    size = 4.8,
+    fontface = "bold",
+    color = "grey20"
+  ) +
+  scale_x_continuous(
+    limits = c(0, max(dados_tipo_plot$TOTAL) * 1.15),
+    breaks = pretty(c(0, max(dados_tipo_plot$TOTAL)), n = 7),
+    labels = label_number(
+      scale = 1e-3,
+      suffix = " mil",
+      big.mark = ".",
+      decimal.mark = ","
+    )
+  ) +
+  labs(
+    x = NULL,
+     y = NULL
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(color = "grey85"),
+    axis.ticks.y = element_blank()
+  )
+```
+
+A @fig-Tipo-Pareto apresenta a distribuição dos licenciamentos por tipo de veículos no município de **`r params$cidade_selecionada`**, evidenciando a participação relativa de cada categoria no total de registros. Observa-se uma forte concentração dos licenciamentos em poucos tipos de veículos, característica comum em centros urbanos onde determinados modais dominam a dinâmica da mobilidade. \vskip0.3cm
+
+Os tipos posicionados no topo do gráfico concentram a maior parcela dos licenciamentos, respondendo por percentuais expressivos do total. Esse padrão indica que ações de planejamento viário, engenharia de tráfego, fiscalização e segurança no trânsito devem priorizar esses segmentos, uma vez que exercem maior pressão sobre a infraestrutura urbana e apresentam maior exposição a riscos operacionais. \vskip0.3cm
+
+De forma objetiva, categorias como **`r tipo_mais_freq$tipo_veiculo`** concentram a maior parte dos licenciamentos no município, reforçando seu papel estruturante na mobilidade local. Em contraste, tipos como **`r tipo_menos_freq$tipo_veiculo`** apresentam participação residual, indicando uso mais específico ou restrito. Essa assimetria evidencia que a frota municipal é fortemente orientada por poucos modais dominantes, informação essencial para orientar decisões estratégicas de gestão, fiscalização e investimento em infraestrutura viária.
+
+
+\newpage
+## Licenciamento de Veículos por Categoria
+
+A categoria do veículo indica sua destinação legal, conforme registro no RENAVAM, abrangendo veículos de uso particular, oficial, de aluguel ou destinados ao transporte comercial, entre outros. A análise dessa variável permite compreender a distribuição funcional da frota municipal segundo o tipo de uso, com implicações diretas para políticas de fiscalização, tributação, planejamento da mobilidade urbana e gestão do espaço viário. \vskip0.3cm
+
+Essa classificação é definida pelo Código de Trânsito Brasileiro (CTB) e regulamentada por resoluções do CONTRAN, sendo amplamente utilizada como referência na formulação de políticas públicas voltadas ao transporte, à circulação e à segurança viária.
+
+
+
+```{r}
+#| tbl-cap: !expr paste("Distribuição da Frota no município de", params$cidade_selecionada, "por Categoria.")
+#| label: tbl-CATEGORIA
+
+criar_tabela_frequencia(df_filtrado, categoria, "CATEGORIA") %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_grand_summary()
+  )
+```
+
+
+
+```{r}
+#| label: AnaliseResumoCategoria
+
+# Resumo por categoria do veículo
+resumo_categoria <- df_filtrado %>%
+  group_by(categoria) %>%
+  filter(!is.na(categoria)) %>%
+  summarise(
+    TOTAL = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    PERCENTUAL = round(100 * TOTAL / sum(TOTAL), 1)
+  ) %>%
+  arrange(desc(TOTAL))
+
+# Categoria dominante e menos comum
+cat_mais_freq <- resumo_categoria %>% slice_max(TOTAL, n = 1, with_ties = FALSE)
+cat_menos_freq <- resumo_categoria %>% slice_min(TOTAL, n = 1, with_ties = FALSE)
+
+# Total de categorias
+n_cat <- nrow(resumo_categoria)
+
+# Cidade
+cidade_analisada <- params$cidade_selecionada
+```
+
+
+A distribuição por categoria de uso no município de **`{r} cidade_analisada`** revela um total de **`{r} n_cat`** categorias distintas de veículos licenciados, evidenciando a diversidade de destinações legais presentes na frota municipal. \vskip0.3cm
+
+A categoria com maior número de registros foi **`{r} cat_mais_freq$categoria`**, representando **`{r} cat_mais_freq$PERCENTUAL`%** do total de licenciamentos, com **`{r} format(cat_mais_freq$TOTAL, big.mark = '.')`** unidades. Esse resultado indica que a frota local é predominantemente orientada para esse tipo de uso, refletindo características específicas da dinâmica urbana, econômica e institucional do município. \vskip0.3cm
+
+Em contraste, a categoria menos frequente foi **`{r} cat_menos_freq$categoria`**, com apenas **`{r} format(cat_menos_freq$TOTAL, big.mark = '.')`** registros, o equivalente a **`{r} cat_menos_freq$PERCENTUAL`%** do total observado. A baixa participação dessa categoria sugere utilização mais restrita ou especializada, possivelmente associada a atividades específicas ou a segmentos menos representativos da frota circulante. \vskip0.3cm
+
+A expressiva concentração dos licenciamentos em uma única categoria reforça a importância de direcionar políticas públicas de mobilidade, fiscalização e planejamento urbano de forma prioritária para esse segmento, uma vez que ele exerce maior impacto sobre a circulação viária, a demanda por infraestrutura e os custos operacionais associados ao sistema de transporte.
+
+
+\newpage
+Dessa forma, a compreensão da distribuição da frota por categoria constitui um subsídio fundamental para a formulação de políticas públicas de mobilidade urbana, definição de estratégias de fiscalização, planejamento da infraestrutura viária e avaliação dos impactos econômicos e operacionais decorrentes do uso dos veículos no espaço urbano. \vskip0.3cm
+
+
+A @fig-Categoria-Barra apresenta a distribuição dos licenciamentos por categoria de uso dos veículos no município de **`{r} cidade_analisada`**, considerando apenas as categorias com participação efetiva no total de registros. Essa opção gráfica permite enfatizar os segmentos que, de fato, compõem a frota circulante e exercem maior influência sobre a dinâmica do trânsito local. \vskip0.3cm
+
+Observa-se uma elevada concentração dos licenciamentos em poucas categorias, o que indica que o uso predominante dos veículos no município está fortemente associado a determinados perfis funcionais, como uso particular, oficial ou comercial. Esse padrão sugere que políticas de fiscalização, arrecadação tributária e planejamento viário devem ser prioritariamente orientadas para essas categorias dominantes. \vskip0.3cm
+
+As categorias posicionadas nas faixas inferiores do gráfico apresentam participação residual, indicando usos mais específicos ou restritos. Embora menos representativas em termos quantitativos, essas categorias permanecem relevantes do ponto de vista regulatório e operacional, motivo pelo qual são mantidas de forma detalhada na tabela correspondente, assegurando a completude e a transparência da informação apresentada.
+
+
+
+```{r}
+#| label: fig-Categoria-Barra
+#| fig-cap: !expr paste(
+#|   "Participação Percentual da Frota por Categorias de Veículos no município de", params$cidade_selecionada)
+#| fig-width: 12
+#| fig-height: 7
+#| fig-dpi: 300
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+library(forcats)
+
+dados_categoria_plot <- resumo_categoria %>%
+  filter(PERCENTUAL > 0) %>%                      # 🔑 REMOVE CATEGORIAS ZERADAS
+  arrange(desc(TOTAL)) %>%
+  mutate(
+     categoria = fct_reorder(categoria, TOTAL, .desc = FALSE),
+    PERC_LABEL = paste0(PERCENTUAL, "%")
+  )
+ggplot(dados_categoria_plot, aes(
+  x = TOTAL,
+  y = categoria
+)) +
+  geom_col(
+     fill = "#1f77b4",
+    color = "grey30",
+    linewidth = 0.3
+  ) +
+  geom_text(
+    aes(label = PERC_LABEL),
+    hjust = -0.08,
+    size = 4.8,
+    fontface = "bold",
+    color = "grey20"
+  ) +
+  scale_x_continuous(
+    limits = c(0, max(dados_categoria_plot$TOTAL) * 1.15),
+    breaks = pretty(c(0, max(dados_categoria_plot$TOTAL)), n = 6),
+    labels = label_number(
+      scale = 1e-3,
+      suffix = " mil",
+      big.mark = ".",
+      decimal.mark = ","
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+   theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(color = "grey85"),
+    axis.ticks.y = element_blank()
+  )
+```
+
+
+
+\newpage
+
+## Licenciamento de Veículos por Cor
+
+
+Trata-se de uma variável de natureza essencialmente descritiva, cujo valor analítico reside na identificação de padrões agregados de preferência e composição da frota.\vskip0.3cm
+
+
+A variável **cor predominante** do veículo é registrada no momento do licenciamento e segue o padrão da SENATRAN. Apesar de não possuir implicações diretas sobre segurança viária, a análise por cor pode revelar padrões culturais e preferências mercadológicas da população. Em alguns casos, cores específicas podem estar associadas a categorias ou finalidades legais (como veículos oficiais, escolares ou de emergência).
+
+
+```{r}
+#| tbl-cap: !expr paste("Distribuição da Frota no município de", params$cidade_selecionada, "por Cor.")
+#| label: tbl-COR
+
+criar_tabela_frequencia(df_filtrado, cor, "COR")  %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_grand_summary()
+  )
+```
+
+
+
+```{r}
+#| label: AnaliseResumoCor
+
+# Resumo por cor do veículo
+resumo_cor <- df_filtrado %>%
+  group_by(cor) %>%
+   filter(!is.na(cor)) %>%
+  summarise(
+    TOTAL = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    PERCENTUAL = round(100 * TOTAL / sum(TOTAL), 1)
+  ) %>%
+  arrange(desc(TOTAL))
+
+# Cor dominante e menos frequente
+cor_mais_freq <- resumo_cor %>% slice_max(TOTAL, n = 1, with_ties = FALSE)
+cor_menos_freq <- resumo_cor %>% slice_min(TOTAL, n = 1, with_ties = FALSE)
+
+# Total de cores distintas
+n_cores <- nrow(resumo_cor)
+
+# Cidade
+cidade_analisada <- params$cidade_selecionada
+```
+
+
+
+A análise da frota licenciada no município de **`{r} cidade_analisada`** com base na **cor dos veículos** revelou um total de **`{r} n_cores`** tonalidades distintas registradas.\vskip0.3cm
+
+A cor predominante foi **`{r} cor_mais_freq$cor`**, que correspondeu a **`{r} cor_mais_freq$PERCENTUAL`%** do total de licenciamentos, com **`{r} format(cor_mais_freq$TOTAL, big.mark = '.')`** veículos registrados.\vskip0.3cm
+
+No extremo oposto, a cor menos comum foi **`{r} cor_menos_freq$cor`**, com apenas **`{r} format(cor_menos_freq$TOTAL, big.mark = '.')`** veículos licenciados, representando **`{r} cor_menos_freq$PERCENTUAL`%** da frota analisada.\vskip0.3cm
+
+Esses dados podem refletir preferências estéticas, influências culturais, condições climáticas locais (cores mais claras em regiões quentes) ou até questões de segurança e visibilidade no trânsito.\vskip0.3cm
+
+Compreender essas preferências por cor também pode auxiliar fabricantes, revendedores e gestores públicos no planejamento de estoques, campanhas de educação no trânsito e políticas voltadas à renovação da frota.\vskip0.3cm
+
+
+\newpage
+
+A @fig-Cor-Barra ilustra a distribuição dos veículos licenciados no município de `{r} cidade_analisada` segundo a cor predominante. Observa-se que a frota apresenta forte concentração em um conjunto restrito de cores, especialmente tons neutros, que respondem pela maior parcela dos registros.\vskip0.3cm
+
+Esse comportamento sugere preferência por cores tradicionalmente associadas à maior aceitação de mercado, facilidade de revenda e menor percepção de desgaste ao longo do tempo. Em contrapartida, as cores com menor participação aparecem de forma residual, indicando escolhas mais específicas ou associadas a nichos particulares de consumo. \vskip0.3cm
+
+De modo geral, a composição cromática da frota reflete um padrão conservador de escolha por parte dos proprietários, reforçando o caráter descritivo dessa variável e sua utilidade como indicador complementar na análise do perfil veicular e do comportamento de consumo no município. \vskip0.3cm
+
+
+
+
+```{r}
+#| label: fig-Cor-Barra
+#| fig-cap: !expr paste(
+#|   "Participação Percentual da Frota por Cor de Veículos no município de", params$cidade_selecionada)
+#| fig-width: 12
+#| fig-height: 7
+#| fig-dpi: 300
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+library(forcats)
+
+dados_cor_plot <- resumo_cor %>%
+   filter(PERCENTUAL > 0) %>%                      # 🔑 REMOVE CATEGORIAS ZERADAS
+  arrange(desc(TOTAL)) %>%
+  mutate(
+    cor = fct_reorder(cor, TOTAL, .desc = FALSE),
+    PERC_LABEL = paste0(PERCENTUAL, "%")
+  )
+ggplot(dados_cor_plot, aes(
+  x = TOTAL,
+  y = cor
+)) +
+  geom_col(
+    fill = "#1f77b4",
+    color = "grey30",
+    linewidth = 0.3
+  ) +
+  geom_text(
+    aes(label = PERC_LABEL),
+    hjust = -0.08,
+    size = 4.8,
+    fontface = "bold",
+    color = "grey20"
+  ) +
+  scale_x_continuous(
+    limits = c(0, max(dados_cor_plot$TOTAL) * 1.15),
+    breaks = pretty(c(0, max(dados_cor_plot$TOTAL)), n = 7),
+    labels = label_number(
+      scale = 1e-3,
+      suffix = "mil",
+      big.mark = ".",
+      decimal.mark = ","
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(color = "grey85"),
+    axis.ticks.y = element_blank()
+  )
+```
+
+### Cor do Veículo e Sua Relação com Roubos e Furtos
+
+A literatura acadêmica em segurança pública apresenta investigações que buscam avaliar a possível associação entre a cor do veículo e a probabilidade de ocorrência de roubos e furtos. Nesse contexto, destaca-se o estudo empírico conduzido por Duarte (2023), desenvolvido no âmbito da Universidade Federal de Minas Gerais, que analisou dados oficiais de boletins de ocorrência de roubos e furtos de veículos registrados no Estado de São Paulo no período de 2016 a 2021. O autor empregou o método de exposição induzida, abordagem utilizada em estudos criminológicos quando não há informações completas sobre a população exposta ao risco, incorporando ainda variáveis relacionadas às condições de luminosidade no momento do delito, consideradas relevantes para a análise da cor do veículo como fator potencial de visibilidade. \vskip0.3cm
+
+
+Os resultados descritivos indicaram que veículos de cores como preto, branco, prata e vermelho apresentaram maiores frequências absolutas de roubo e furto quando comparados a cores menos comuns, como azul, verde, marrom e amarelo. No entanto, ao aplicar modelos estatísticos ajustados, especialmente modelos binomiais negativos, Duarte (2023) demonstrou que não há evidência estatisticamente significativa de que a cor do veículo, isoladamente, aumente ou reduza o risco de roubo ou furto, quando comparada à cor branca, adotada como categoria de referência. Esses achados sugerem que a maior incidência observada em determinadas cores está fortemente associada à sua maior participação na frota circulante, e não a uma preferência criminosa específica. \vskip0.3cm
+
+Do ponto de vista metodológico, essa conclusão está alinhada com a literatura criminológica que aponta que fatores estruturais e contextuais exercem influência mais robusta sobre a vitimização veicular. Elementos como localização geográfica, perfil socioeconômico da área, modelo e valor do veículo, facilidade de revenda no mercado ilegal, presença de sistemas de segurança e oportunidades de fuga tendem a ser determinantes mais relevantes do que atributos estéticos como a cor da pintura. Nesse sentido, Silva (2024) reforça que, embora a cor do veículo seja uma variável frequentemente registrada nos boletins de ocorrência, sua interpretação isolada sem controle por variáveis de contexto e exposição tende a refletir apenas a distribuição populacional das cores na frota, especialmente de cores neutras como branco e prata, amplamente predominantes no mercado automotivo brasileiro. \vskip0.3cm
+
+Esses achados indicam que, apesar de percepções populares e narrativas recorrentes como a suposição de que cores chamativas seriam menos visadas por dificultarem a ocultação do veículo, a evidência científica ajustada não sustenta a hipótese de que a cor do veículo constitua, por si só, um fator de risco significativo para roubos ou furtos (DUARTE, 2023; SILVA, 2024). Sob a ótica das políticas públicas e das estratégias de segurança, os resultados sugerem que ações preventivas mais eficazes devem concentrar-se em variáveis de maior impacto comprovado, como inteligência territorial, vigilância urbana, tecnologias de rastreamento, controle de mercados ilegais e planejamento urbano, em detrimento de atributos meramente estéticos.
+
+
+### Cor do Veículo e Risco de Sinistros de Trânsito
+
+Embora a cor do veículo não exerça influência direta sobre aspectos mecânicos de segurança nem sobre a regulamentação formal de trânsito, estudos no campo da segurança viária têm investigado sua possível associação com o risco relativo de envolvimento em sinistros, especialmente sob a perspectiva da visibilidade e percepção visual em diferentes condições ambientais. Essas análises são particularmente relevantes em abordagens multidimensionais que consideram a interação entre características veiculares, condições de iluminação, fatores ambientais e comportamento dos condutores. \vskip0.3cm
+
+Pesquisas de base epidemiológica conduzidas a partir de grandes bancos de dados de acidentes apontam que a cor do veículo pode estar associada a variações estatisticamente significativas no risco de colisão. Um estudo clássico desenvolvido pelo *Monash University Accident Research Centre*, liderado por Furness et al. (2010), analisou centenas de milhares de registros de acidentes na Austrália e identificou que veículos de cores com menor contraste visual, como preto, cinza e prata, apresentaram maior risco relativo de envolvimento em colisões quando comparados a veículos brancos, utilizados como referência nos modelos estatísticos. Essa associação foi observada principalmente em condições de iluminação diurna, quando se esperaria maior capacidade de detecção visual por parte dos demais usuários da via. \vskip0.3cm
+
+Resultados semelhantes foram encontrados em estudos europeus. Uma análise conduzida na Espanha por Lardelli-Claret et al. (2013) indicou que veículos de cores claras, como branco e amarelo, apresentaram menor risco de envolvimento passivo em colisões, sugerindo que a maior visibilidade desses tons pode atuar como um fator protetivo em determinadas condições ambientais. Os autores destacam, contudo, que a magnitude desse efeito é relativamente modesta quando comparada a outros determinantes de risco, como velocidade, consumo de álcool, fadiga e infraestrutura viária. \vskip0.3cm
+
+De forma integrada, a literatura indica que a cor do veículo pode exercer um papel secundário na segurança viária, sobretudo em cenários específicos de visibilidade, mas não deve ser interpretada como fator causal isolado para a ocorrência de sinistros de trânsito (FURNESS et al., 2010; LARDELLI-CLARET et al., 2013). Assim, no contexto do presente boletim, a análise da distribuição das cores da frota deve ser compreendida prioritariamente como um indicador descritivo de preferências de mercado e padrões culturais, com implicações limitadas e indiretas para a segurança pública e viária.
+
+
+
+\newpage
+
+## Licenciamento de Veículos por Combustível
+
+A análise da frota por tipo de combustível permite compreender a matriz energética predominante no transporte urbano. Os registros contemplam combustíveis tradicionais (gasolina, etanol, diesel), mistos e alternativas mais recentes, como eletricidade e GNV. Essa análise é estratégica para políticas ambientais e para a transição energética no setor de mobilidade urbana, além de estar alinhada aos registros da SENATRAN e às diretrizes do Programa de Controle da Poluição do Ar por Veículos Automotores (PROCONVE).
+
+
+```{r}
+#| tbl-cap: !expr paste("Distribuição da Frota no município de", params$cidade_selecionada, "por Tipo de Combustível.")
+#| label: tbl-COMBUSTIVEL
+
+criar_tabela_frequencia(df_filtrado, combustivel, "COMBUSTÍVEL") %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_grand_summary()
+  )
+```
+
+
+
+```{r}
+#| label: AnaliseResumoCombustivel
+
+# Resumo por tipo de combustível
+resumo_combustivel <- df_filtrado %>%
+  group_by(combustivel) %>%
+   filter(!is.na(combustivel)) %>%
+  summarise(
+    TOTAL = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    PERCENTUAL = round(100 * TOTAL / sum(TOTAL), 1)
+  ) %>%
+  arrange(desc(TOTAL))
+
+# Tipo mais e menos frequente
+comb_mais_freq <- resumo_combustivel %>% slice_max(TOTAL, n = 1, with_ties = FALSE)
+comb_menos_freq <- resumo_combustivel %>% slice_min(TOTAL, n = 1, with_ties = FALSE)
+
+# Total de tipos distintos
+n_combustiveis <- nrow(resumo_combustivel)
+
+# Cidade analisada
+cidade_analisada <- params$cidade_selecionada
+```
+
+
+A distribuição dos licenciamentos por **tipo de combustível** no município de **`{r} cidade_analisada`** revela uma frota composta por **`{r} n_combustiveis`** modalidades de abastecimento, evidenciando o padrão energético predominante do transporte local, refletido na composição estrutural da frota licenciada. \vskip0.3cm
+
+O tipo de combustível mais utilizado é **`{r} comb_mais_freq$combustivel`**, representando **`{r} comb_mais_freq$PERCENTUAL`%** do total, com **`{r} format(comb_mais_freq$TOTAL, big.mark = '.')`** registros.\vskip0.3cm
+
+Por outro lado, a menor participação ficou com veículos movidos a **`{r} comb_menos_freq$combustivel`**, totalizando apenas **`{r} format(comb_menos_freq$TOTAL, big.mark = '.')`** unidades licenciadas, o equivalente a (`{r} comb_menos_freq$PERCENTUAL`% do total).\vskip0.3cm
+
+O predomínio de certos combustíveis pode refletir aspectos como custo-benefício, infraestrutura de abastecimento local, incentivos fiscais ou políticas ambientais. Já a presença de veículos com combustíveis alternativos (como elétrico, GNV ou híbrido) pode indicar avanços na transição energética da frota municipal.\vskip0.3cm
+
+Essa análise é fundamental para subsidiar decisões sobre infraestrutura urbana, investimentos em energia limpa e planejamento de políticas públicas voltadas à mobilidade sustentável.\vskip0.3cm
+
+
+
+
+\newpage
+
+
+A @fig-Combustivel-Barra apresenta a distribuição dos licenciamentos de veículos por tipo de combustível no município de `{r} cidade_analisada`, evidenciando a composição da matriz energética da frota circulante. Observa-se uma clara concentração dos registros em poucos tipos de combustível, com predominância dos combustíveis tradicionais e dos sistemas flexíveis, enquanto as demais modalidades aparecem com participação residual. \vskip0.3cm
+
+
+
+```{r}
+#| label: fig-Combustivel-Barra
+#| fig-cap: !expr paste(
+#|   "Participação Percentual da Frota por Tipo de Combustível no município de", params$cidade_selecionada)
+#| fig-width: 12
+#| fig-height: 7
+#| fig-dpi: 300
+
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+library(forcats)
+
+dados_combustivel_plot <- resumo_combustivel %>%
+  filter(PERCENTUAL > 0) %>%                     # 🔑 remove categorias zeradas
+  arrange(desc(TOTAL)) %>%
+  mutate(
+    combustivel = fct_reorder(combustivel, TOTAL, .desc = FALSE),
+    PERC_LABEL  = paste0(PERCENTUAL, "%")
+  )
+ggplot(
+  dados_combustivel_plot, aes(
+    x = TOTAL,
+    y = combustivel
+  )) +
+  geom_col(
+    fill = "#1f77b4",
+    color = "grey30",
+    linewidth = 0.3
+  ) +
+  geom_text(
+    aes(label = PERC_LABEL),
+    hjust = -0.08,
+    size = 4.8,
+    fontface = "bold",
+    color = "grey20"
+  ) +
+   scale_x_continuous(
+    limits = c(0, max(dados_combustivel_plot$TOTAL) * 1.15),
+    breaks = pretty(c(0, max(dados_combustivel_plot$TOTAL)), n = 7),
+    labels = label_number(
+      scale = 1e-3,
+      suffix = " mil",
+      big.mark = ".",
+      decimal.mark = ","
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+   theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(color = "grey85"),
+    axis.ticks.y = element_blank()
+  )
+```
+
+
+Os combustíveis posicionados no topo do gráfico concentram a maior parcela dos licenciamentos, indicando que a mobilidade urbana local permanece fortemente dependente de fontes energéticas consolidadas, como gasolina, etanol e diesel. Esse padrão reflete tanto a disponibilidade da infraestrutura de abastecimento quanto fatores econômicos, como custo de aquisição dos veículos e preços relativos dos combustíveis, além de características históricas da frota brasileira. \vskip0.3cm
+
+Em contraste, os combustíveis alternativos e de menor participação como eletricidade, GNV e outras combinações menos comuns apresentam percentuais reduzidos, o que evidencia que a transição energética no município ainda se encontra em estágio inicial. A baixa expressividade dessas categorias sugere limitações associadas à infraestrutura de recarga ou abastecimento, barreiras econômicas e ausência de incentivos locais específicos à adoção dessas tecnologias. \vskip0.3cm
+
+De forma geral, o gráfico reforça que a matriz energética da frota municipal é marcada por forte assimetria, na qual poucos tipos de combustível respondem pela quase totalidade dos licenciamentos. Esse resultado é particularmente relevante para o planejamento urbano e ambiental, pois indica que políticas voltadas à mobilidade sustentável e à redução de emissões precisam considerar, prioritariamente, a predominância atual dos combustíveis convencionais, ao mesmo tempo em que criam condições estruturais para a ampliação gradual da participação de alternativas energéticas mais limpas.
+
+
+
+
+\newpage
+### Eletrificação da Frota Veicular
+
+A literatura internacional tem demonstrado de forma consistente que a eletrificação da frota veicular constitui um dos principais eixos da transição energética no setor de transportes, sobretudo em países que implementaram políticas públicas integradas de incentivo econômico, regulação ambiental e expansão da infraestrutura de recarga. Países como China, Noruega e Estados Unidos apresentam evidências empíricas robustas de que a adoção de veículos elétricos (VEs) ocorre de forma acelerada quando há coordenação entre instrumentos fiscais, políticas industriais e planejamento urbano (IEA, 2024; NILSSON; NORDLUND, 2022). \vskip0.3cm
+
+No caso chinês, estudos apontam que a ampla difusão de veículos elétricos resulta de uma estratégia estatal de longo prazo, que combina subsídios diretos, metas obrigatórias de produção para montadoras e investimentos massivos em infraestrutura de recarga. Pesquisas baseadas em grandes bases de dados urbanos indicam que a China alcançou níveis elevados de eletrificação da frota em grandes centros metropolitanos, com impactos positivos na redução de emissões locais de poluentes atmosféricos e gases de efeito estufa (DENG et al., 2023; ZHOU et al., 2021). Esses resultados reforçam o papel do Estado como indutor da transição tecnológica no transporte. \vskip0.3cm
+
+A experiência da Noruega é frequentemente citada como um caso paradigmático de sucesso na adoção de veículos elétricos em larga escala. Diferentemente do modelo chinês, a estratégia norueguesa concentrou-se em incentivos ao consumidor final, como isenção de impostos, redução de tarifas de pedágio e benefícios de circulação urbana. Estudos empíricos demonstram que essas medidas foram decisivas para que os veículos elétricos atingissem participação majoritária nas vendas de automóveis novos no país, transformando rapidamente o perfil da frota nacional (FÆHN et al., 2022; NILSSON; NORDLUND, 2022). \vskip0.3cm
+
+Nos Estados Unidos e na União Europeia, a literatura aponta que a adoção de veículos elétricos ocorre de maneira mais heterogênea, variando conforme o nível de renda regional, os preços relativos dos combustíveis fósseis e a densidade da infraestrutura de recarga. Pesquisas mostram que, embora os incentivos federais sejam relevantes, fatores locais — como políticas estaduais, planejamento urbano e perfil socioeconômico exercem influência significativa sobre a decisão de adoção dessa tecnologia (SHE et al., 2021; SOVACOOL et al., 2020). \vskip0.3cm
+
+No contexto brasileiro, os estudos ainda indicam uma participação incipiente de veículos elétricos na frota, o que é compatível com os resultados observados no gráfico analisado neste boletim. Pesquisas nacionais destacam que, apesar do avanço recente nas vendas de veículos híbridos e elétricos, a eletrificação no Brasil enfrenta limitações estruturais, como o alto custo de aquisição, a concentração espacial da infraestrutura de recarga e a ausência de uma política nacional contínua voltada à mobilidade elétrica (COSTA; GUIMARÃES; RIBEIRO, 2021; BORGES; SILVA, 2023). \vskip0.3cm
+
+Adicionalmente, autores brasileiros ressaltam que o país apresenta uma particularidade relevante: a predominância histórica de biocombustíveis, especialmente o etanol, como alternativa aos combustíveis fósseis. Esse fator contribui para uma transição energética no transporte com características distintas das observadas em países desenvolvidos, o que ajuda a explicar a menor velocidade de adoção dos veículos totalmente elétricos (GOLDEMBERG; LUCON, 2018; ANFAVEA, 2023). \vskip0.3cm
+
+Dessa forma, a comparação entre as evidências internacionais e os dados locais apresentados no gráfico sugere que o perfil atual da frota brasileira reflete um estágio intermediário da transição energética, fortemente ancorado em combustíveis tradicionais e biocombustíveis, com baixa participação relativa de veículos elétricos. A literatura internacional indica que avanços mais expressivos nesse indicador dependem da implementação de políticas públicas integradas, expansão da infraestrutura de recarga e redução das barreiras econômicas à adoção dessa tecnologia.
+
+
+
+\newpage
+
+## Licenciamento de Veículos por Espécie
+
+A espécie veicular refere-se à natureza estrutural e funcional do veículo, como carga, passageiro, misto, competição, coleção, entre outros. Essa classificação é definida pelas normativas do CONTRAN e possui implicações diretas sobre a regulamentação da circulação, o licenciamento e a destinação legal dos veículos. A análise por espécie é fundamental para compreender o perfil funcional da frota municipal e sua relação com as dinâmicas econômicas, sociais e territoriais.
+
+
+```{r}
+#| tbl-cap: !expr paste("Distribuição da Frota no município de", params$cidade_selecionada, "por Espécie de Veículo.")
+#| label: tbl-ESPECIE_VEICULO
+
+criar_tabela_frequencia(df_filtrado, especie_veiculo, "ESPÉCIE DE VEÍCULO") %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_grand_summary()
+  )
+  
+```
+
+
+```{r}
+#| label: AnaliseResumoEspecie
+
+# Resumo por espécie de veículo
+resumo_especie <- df_filtrado  %>%
+  group_by(especie_veiculo) %>%
+     filter(!is.na(especie_veiculo)) %>%
+  summarise(
+    TOTAL = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    PERCENTUAL = round(100 * TOTAL / sum(TOTAL), 1)
+  ) %>%
+  arrange(desc(TOTAL))
+
+# Espécie mais e menos frequente
+esp_mais_freq <- resumo_especie %>% slice(1)
+esp_menos_freq <- resumo_especie %>% slice(n())
+
+# Total de espécies distintas
+n_especies <- nrow(resumo_especie)
+
+# Cidade analisada
+cidade_analisada <- params$cidade_selecionada
+```
+
+
+A frota licenciada no município de **`{r} cidade_analisada`** apresenta **`{r} n_especies`** espécies distintas de veículos, evidenciando a diversidade funcional da frota circulante.\vskip0.3cm
+
+A espécie mais frequente é **`{r} esp_mais_freq$especie_veiculo`**, com **`{r} format(esp_mais_freq$TOTAL, big.mark = '.')`** registros, correspondendo a **`{r} esp_mais_freq$PERCENTUAL`%** do total analisado.\vskip0.3cm
+
+
+Em contraste, a espécie menos representativa é **`{r} esp_menos_freq$especie_veiculo`**, com apenas **`{r} format(esp_menos_freq$TOTAL, big.mark = '.')`** unidades licenciadas, o que equivale a **`{r} esp_menos_freq$PERCENTUAL`%**.\vskip0.3cm
+
+A predominância de veículos da espécie passageiro sugere uma frota fortemente orientada ao deslocamento individual e familiar. Por outro lado, a presença de veículos de carga, ainda que proporcionalmente menor, pode indicar atividades comerciais, logísticas ou agroindustriais relevantes no contexto econômico local.
+
+
+
+\newpage
+
+A @fig-Especie-Barra ilustra a distribuição dos licenciamentos de veículos por espécie no município de `{r} cidade_analisada`, evidenciando a concentração da frota em um conjunto restrito de usos predominantes. Observa-se que poucas espécies concentram a maior parcela dos registros, enquanto as demais apresentam participação residual.\vskip0.3cm
+
+Esse padrão indica que a frota municipal é funcionalmente assimétrica, com forte predominância de veículos destinados ao transporte de passageiros, característica comum em municípios com dinâmica urbana centrada na mobilidade individual. Em contrapartida, espécies associadas a usos especializados como carga, misto, competição ou coleção exercem papel mais específico e pontual na estrutura da frota.\vskip0.3cm
+
+Do ponto de vista do planejamento urbano e da gestão do trânsito, essa distribuição fornece subsídios relevantes para o dimensionamento da infraestrutura viária, definição de políticas de mobilidade, ações de fiscalização e ordenamento do uso do espaço urbano, uma vez que os veículos de passageiros tendem a concentrar a maior pressão sobre o sistema viário municipal.
+
+
+
+
+```{r}
+#| label: fig-Especie-Barra
+#| fig-cap: !expr paste(
+#|   "Participação Percentual da Frota por Espécie de Veículos no município de", params$cidade_selecionada)
+#| fig-width: 12
+#| fig-height: 7
+#| fig-dpi: 300
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+library(forcats)
+
+dados_especie_plot <- resumo_especie %>%
+  filter(PERCENTUAL > 0) %>%                    # 🔑 Remove categorias zeradas
+  arrange(desc(TOTAL)) %>%
+  mutate(
+    especie_veiculo = fct_reorder(especie_veiculo, TOTAL, .desc = FALSE),
+    PERC_LABEL = paste0(PERCENTUAL, "%")
+  )
+ggplot(dados_especie_plot, aes(
+  x = TOTAL,
+  y = especie_veiculo
+)) +
+  geom_col(
+      fill = "#1f77b4",
+    color = "grey30",
+    linewidth = 0.3
+  ) +
+  geom_text(
+    aes(label = PERC_LABEL),
+    hjust = -0.08,
+    size = 4.8,
+    fontface = "bold"
+  ) +
+  scale_x_continuous(
+    limits = c(0, max(dados_especie_plot$TOTAL) * 1.15),
+    breaks = pretty(c(0, max(dados_especie_plot$TOTAL)), n = 7),
+    labels = label_number(
+      scale = 1e-3,
+      suffix = " mil",
+      big.mark = ".",
+      decimal.mark = ","
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(color = "grey85"),
+    axis.ticks.y = element_blank()
+  )
+```
+
+
+\newpage
+
+## Licenciamento de Veículos por Espécie versus Combustível
+
+A @fig-Especie-Combustivel-map de distribuição percentual da frota por espécie de veículo e tipo de combustível foi elaborado com o objetivo de evidenciar, de forma integrada e comparativa, a relação entre a função veicular e as matrizes energéticas predominantes no município analisado. Essa abordagem permite compreender como diferentes categorias funcionais como veículos de passageiros, carga ou uso misto se associam a determinados tipos de motorização, revelando padrões estruturais da composição da frota local. \vskip0.3cm
+
+A intensidade das cores representa a participação percentual de cada tipo de combustível dentro de cada espécie de veículo, possibilitando a identificação imediata de concentrações e contrastes relevantes. Dessa forma, o gráfico facilita a visualização de associações dominantes, como a maior presença de combustíveis flex ou gasolina em veículos de passageiros, bem como a predominância do diesel em espécies vinculadas ao transporte de carga e atividades produtivas. \vskip0.3cm
+
+Do ponto de vista analítico, essa representação visual contribui para a compreensão do perfil de uso da frota no município de `{r} cidade_analisada`, oferecendo subsídios importantes para o planejamento da infraestrutura de abastecimento, a formulação de políticas públicas voltadas à mobilidade urbana e a avaliação de potenciais impactos ambientais. Além disso, o cruzamento entre espécie e combustível permite inferências operacionais relevantes, como a dependência de determinados setores econômicos em relação a fontes energéticas específicas e suas implicações para a sustentabilidade do sistema viário. \vskip0.3cm
+
+
+
+```{r}
+#| label: fig-Especie-Combustivel-map
+#| fig-cap: !expr paste(
+#|   "Mapa de Calor da Frota por Espécie versus Tipo de Combustível no município de", params$cidade_selecionada)
+#| fig-width: 12
+#| fig-height: 7
+#| fig-dpi: 300
+
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+library(forcats)
+
+# ===============================
+# Base cruzada Espécie × Combustível
+# ===============================
+dados_heatmap <- df_filtrado %>%
+  filter(combustivel %in% c("DIESEL", "GASOLINA", "GASOLINA E ALCOOL")) %>%
+  group_by(especie_veiculo, combustivel) %>%
+  summarise(TOTAL = n(), .groups = "drop") %>%
+  group_by(especie_veiculo) %>%
+  mutate(
+    PERC = round(100 * TOTAL / sum(TOTAL), 1)
+  ) %>%
+  ungroup()
+
+# ===============================
+# Rótulos simbólicos (storytelling)
+# ===============================
+dados_heatmap <- dados_heatmap %>%
+  mutate(
+    combustivel_rotulo = case_when(
+      combustivel == "DIESEL" ~ "DIESEL",
+      combustivel == "GASOLINA" ~ "GASOLINA",
+      combustivel == "GASOLINA E ALCOOL" ~ "FLEX",
+      TRUE ~ combustivel
+    ),
+    especie_veiculo = fct_reorder(especie_veiculo, PERC, .fun = max)
+  )
+ggplot(
+  dados_heatmap,
+  aes(
+    x = combustivel_rotulo,
+    y = especie_veiculo,
+    fill = PERC
+  )
+) +
+  geom_tile(
+    color = "white",
+    linewidth = 0.4
+  ) +
+  geom_text(
+    aes(label = paste0(PERC, "%")),
+    size = 5,
+    fontface = "bold",
+    color = "grey10"
+  ) +
+  scale_fill_gradient(
+    low = "#e8f4f8",
+    high = "#1f77b4",
+    labels = function(x) paste0(x, "%"),
+    name = "Licenciamentos"
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    axis.ticks = element_blank(),
+    legend.position = "right",
+    plot.title = element_text(face = "bold")
+  )
+```
+
+
+\newpage
+
+## Licenciamento de Veículos por Nacionalidade
+
+A frota de veículos que circula pelas estradas paraenses apresenta variação quanto à origem de fabricação, refletindo a estrutura do mercado automotivo brasileiro e a influência de fatores econômicos, tributários e históricos sobre o processo de licenciamento veicular. A análise da nacionalidade dos veículos constitui um indicador relevante para compreender a inserção do município nas dinâmicas produtivas do setor automotivo e seus reflexos sobre a composição da frota circulante.\vskip0.3cm
+
+A nacionalidade do veículo, informada no momento do licenciamento, permite distinguir veículos de fabricação nacional daqueles importados. Esse atributo está associado a aspectos econômicos e mercadológicos, como custos de aquisição, tributação, disponibilidade de peças e rede de assistência técnica, além de influenciar práticas de manutenção e reposição. No âmbito da gestão pública, a nacionalidade veicular impacta diretamente o controle da frota, a regulação do mercado automotivo e o planejamento das ações de fiscalização, inspeção e manutenção.\vskip0.3cm
+
+No município de **`r params$cidade_selecionada`**, a frota licenciada contempla apenas duas categorias de nacionalidade veicular, o que evidencia uma baixa diversificação quanto à origem de fabricação, com predominância expressiva de veículos produzidos pela indústria automotiva nacional
+
+
+```{r}
+#| tbl-cap: !expr paste("Distribuição da Frota no município de", params$cidade_selecionada, "por Nacionalidade.")
+#| label: tbl-NACIONALIDADE
+
+criar_tabela_frequencia(df_filtrado, nacionalidade, "NACIONALIDADE") %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_grand_summary()
+  )
+```
+
+
+```{r}
+#| label: AnaliseResumoNacionalidade
+
+resumo_nacionalidade <- df_filtrado %>%
+  group_by(nacionalidade) %>%
+  summarise(TOTAL = n(), .groups = "drop") %>%
+  mutate(PERCENTUAL = round(100 * TOTAL / sum(TOTAL), 1)) %>%
+  arrange(desc(TOTAL))
+
+n_nacionalidades <- nrow(resumo_nacionalidade)
+
+nac_mais_freq <- resumo_nacionalidade %>% slice_max(order_by = TOTAL, n = 1)
+nac_menos_freq <- resumo_nacionalidade %>% slice_min(order_by = TOTAL, n = 1)
+
+cidade_analisada <- params$cidade_selecionada
+```
+
+
+A @tbl-NACIONALIDADE apresenta a distribuição absoluta e percentual da frota licenciada segundo a nacionalidade dos veículos no município analisado, permitindo uma visão sintética da composição da frota quanto à sua origem de fabricação. \vskip0.3cm
+
+A maior parte dos registros corresponde a veículos **`r nac_mais_freq$nacionalidade`**, totalizando **`r format(nac_mais_freq$TOTAL, big.mark='.')`** unidades, o que representa **`r nac_mais_freq$PERCENTUAL`%** da frota analisada. \vskip0.3cm
+
+Por outro lado, os veículos classificados como **`r nac_menos_freq$nacionalidade`** constituem a menor fração da frota, somando 
+**`r format(nac_menos_freq$TOTAL, big.mark = '.')`** licenciamentos, o que equivale a **`r nac_menos_freq$PERCENTUAL`%** do total observado. \vskip0.3cm
+
+Esses resultados fornecem subsídios relevantes para a formulação de políticas públicas voltadas à mobilidade urbana, à fiscalização veicular e ao planejamento da infraestrutura, além de contribuírem para a compreensão do grau de dependência local em relação à indústria automotiva nacional e às cadeias produtivas associadas.
+
+
+\newpage
+
+A @fig-Nacionalidade-Barra evidencia a forte concentração da frota licenciada no município de **`r params$cidade_selecionada`** em veículos de fabricação nacional. Observa-se que essa categoria responde por praticamente a totalidade dos registros, enquanto os veículos importados representam uma participação residual na frota circulante.\vskip0.3cm
+
+Esse padrão reflete características estruturais do mercado automotivo brasileiro, marcado por elevada produção nacional, políticas de incentivo à indústria local e custos relativamente mais elevados de aquisição e manutenção de veículos importados. Sob a perspectiva da gestão pública, a predominância de veículos nacionais tende a simplificar ações de fiscalização, manutenção e reposição de peças, além de indicar menor dependência de cadeias produtivas externas no contexto da frota municipal.
+
+
+
+```{r}
+#| label: fig-Nacionalidade-Barra
+#| fig-cap: !expr paste(
+#|   "Participação percentual da frota por nacionalidade no município de", params$cidade_selecionada)
+#| fig-width: 12
+#| fig-height: 7
+#| fig-dpi: 300
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+library(forcats)
+
+dados_nac_plot <- resumo_nacionalidade %>%
+  mutate(
+    nacionalidade = fct_reorder(nacionalidade, TOTAL),
+    PERC_LABEL = paste0(PERCENTUAL, "%")
+  )
+ggplot(dados_nac_plot, aes(
+  x = TOTAL,
+  y = nacionalidade
+)) +
+  geom_col(
+     fill = "#1f77b4",
+    color = "grey30",
+    linewidth = 0.3
+  ) +
+  geom_text(
+    aes(label = PERC_LABEL),
+    hjust = -0.05,
+    size = 4.8,
+    fontface = "bold"
+  ) +
+  scale_x_continuous(
+    limits = c(0, max(dados_nac_plot$TOTAL) * 1.15),
+    breaks = pretty(c(0, max(dados_nac_plot$TOTAL)), n = 7),
+    labels = label_number(
+      scale = 1e-3,
+      suffix = " mil",
+      big.mark = ".",
+      decimal.mark = ","
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(color = "grey85"),
+    axis.ticks.y = element_blank()
+  )
+```
+
+
+\newpage
+
+## Licenciamento de Veículos por Bairro
+
+A análise da distribuição espacial da frota por bairro permite identificar os principais polos de concentração veicular no município, evidenciando áreas com maior intensidade de uso do sistema viário. Esse tipo de abordagem é fundamental para compreender a dinâmica territorial da mobilidade urbana, uma vez que a localização dos veículos licenciados está diretamente associada a padrões de ocupação do solo, densidade populacional, atividade econômica e oferta de serviços públicos.\vskip0.3cm
+
+
+
+
+```{r}
+#| tbl-cap: !expr paste("Ranking dos 35 Bairros com Maior Frota no município de", params$cidade_selecionada)
+#| label: tbl-BAIRRO
+
+# 1. Identificar os 35 bairros com maior frota
+top_15_bairros <- df_filtrado %>%
+  count(nmbairro, sort = TRUE) %>%
+  slice_max(n = 35, order_by = n) %>%
+  pull(nmbairro)
+
+# 2. Criar o dataframe sumarizado com a categoria "OUTROS"
+df_bairros_final <- df_filtrado %>%
+  mutate(nmbairro_ajustado = ifelse(nmbairro %in% top_15_bairros, 
+                                    as.character(nmbairro), 
+                                    "OUTROS")) %>%
+  # Garantir que "OUTROS" fique no final da tabela após o arrange
+  mutate(nmbairro_ajustado = factor(nmbairro_ajustado, 
+                                    levels = c(top_15_bairros, "OUTROS")))
+
+# 3. Aplicar a sua função de tabela (ajustada para a nova coluna)
+df_bairros_final %>%
+  rename(BAIRRO_AUX = nmbairro_ajustado) %>% # Nome temporário para a função
+  criar_tabela_frequencia(BAIRRO_AUX, "BAIRRO") %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_grand_summary()
+  )
+
+```
+
+
+```{r}
+#| label: AnaliseResumoBairro
+
+resumo_bairro <- df_filtrado %>%
+  group_by(nmbairro) %>%
+  summarise(TOTAL = n(), .groups = "drop") %>%
+  mutate(PERCENTUAL = round(100 * TOTAL / sum(TOTAL), 1)) %>%
+  arrange(desc(TOTAL))
+
+n_bairros <- nrow(resumo_bairro)
+
+bairro_mais_freq <- resumo_bairro %>% slice_max(order_by = TOTAL, n = 1)
+bairro_menos_freq <- resumo_bairro %>% slice_min(order_by = TOTAL, n = 1)
+```
+
+
+\newpage
+
+O ranking apresentado a seguir detalha os 35 bairros com maior contingente de veículos licenciados no município de **`r params$cidade_selecionada`**, destacando aquelas áreas que concentram parcela expressiva da frota circulante. Esses bairros tendem a apresentar maior geração e atração de viagens, o que implica demandas diferenciadas por intervenções de engenharia de tráfego, ações de fiscalização preventiva, planejamento de estacionamentos e políticas de mobilidade urbana sustentável. \vskip0.3cm
+
+
+A @tbl-BAIRRO apresenta a distribuição absoluta e percentual da frota licenciada por bairro, considerando os 35 bairros com maior número de registros e a agregação das demais localidades na categoria “OUTROS”. Essa estratégia metodológica permite preservar a legibilidade da tabela, ao mesmo tempo em que mantém a representatividade global da frota municipal.\vskip0.3cm
+
+Observa-se que os bairros posicionados no topo do ranking concentram uma fração significativa dos licenciamentos, evidenciando uma distribuição espacial assimétrica da frota. Tal padrão sugere que determinadas áreas do município exercem papel central na dinâmica urbana, seja como zonas residenciais de alta densidade, seja como áreas de intensa atividade comercial, administrativa ou de serviços.
+
+
+
+\newpage
+
+
+A @fig-Bairros ilustra graficamente a distribuição espacial da frota veicular nos 35 bairros com maior número de veículos licenciados em `r params$cidade_selecionada`, permitindo uma visualização clara das disparidades entre as diferentes localidades. O gráfico evidencia uma forte concentração da frota em poucos bairros, enquanto os demais apresentam participação relativa significativamente menor.\vskip0.3cm
+
+Os bairros que lideram o ranking respondem individualmente por parcelas relevantes do total de veículos licenciados, configurando-se como áreas prioritárias para o planejamento urbano e viário. Nessas regiões, a elevada densidade veicular tende a impactar diretamente a fluidez do tráfego, a demanda por vagas de estacionamento, os níveis de congestionamento e a necessidade de fiscalização contínua.\vskip0.3cm
+
+Em contrapartida, os bairros com menor participação no ranking apresentam frota mais reduzida, o que pode estar associado a menor densidade populacional, características predominantemente residenciais de baixa ocupação ou menor concentração de atividades econômicas. Essa heterogeneidade espacial reforça a importância de políticas públicas territorialmente orientadas, capazes de adequar as estratégias de mobilidade, fiscalização e infraestrutura viária às especificidades de cada bairro.\vskip0.3cm
+
+De forma geral, a análise por bairro fornece subsídios técnicos relevantes para a gestão municipal, contribuindo para a definição de áreas prioritárias de intervenção, o aprimoramento do ordenamento do tráfego urbano e o planejamento de ações integradas voltadas à melhoria da mobilidade e da segurança viária.
+
+
+```{r}
+#| label: fig-Bairros
+#| fig-cap: !expr 'paste("Participação Percentual da Frota(35 Bairros) no município de", params$cidade_selecionada)'
+#| fig-width: 25
+#| fig-height: 14
+#| fig-dpi: 650
+#| out-width: "100%"
+#| fig-align: center
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# 1. Filtro dos dados (Garantindo ordenação correta)
+
+resumo_bairro <- df_filtrado %>%
+  count(nmbairro, name = "TOTAL") %>%
+  mutate(PERCENTUAL = (TOTAL / sum(TOTAL)) * 100) %>%
+  slice_max(order_by = TOTAL, n = 35, with_ties = FALSE)
+
+# 2. Gráfico com ajustes de legibilidade
+ggplot(resumo_bairro, aes(x = reorder(nmbairro, TOTAL), y = TOTAL)) +
+  geom_col(fill = "#1f77b4", 
+           width = 0.85) + 
+  geom_text(aes(label = paste0(format(TOTAL, big.mark = "."), 
+                               " (", round(PERCENTUAL, 1), "%)")), 
+            hjust = -0.12, 
+            size = 6, 
+            fontface = "bold") +
+  coord_flip() +
+  # Expandimos o limite do eixo Y para os textos não sumirem na borda
+  scale_y_continuous(labels = label_number(big.mark = "."), 
+                     expand = expansion(mult = c(0, 0.35))) +
+  
+  labs(
+    title = NULL,
+    subtitle = NULL,
+    x = NULL, 
+    y = NULL
+  ) +
+  theme_minimal(base_size = 16) + # Base_size ligeiramente menor
+  theme(
+    plot.title = element_text(face = "bold", size = 20, color = "#002b5c"),
+    
+    # Ajuste fino no texto do eixo Y (os bairros)
+    axis.text.y = element_text(size = 14, face = "bold", color = "black"),
+    axis.text.x = element_text(size = 12),
+    panel.grid.major.y = element_blank(),
+    plot.margin = ggplot2::margin(30, 30, 30, 30, unit = "pt")
+  )
+```
+
+
+
+\newpage
+# CONSIDERAÇÕES FINAIS
+
+A análise estatística sistematizada da frota veicular do município de `r params$cidade_selecionada`,  considerando a partir de `r params$year_initial` definido na parametrização do estudo, evidencia transformações relevantes no perfil da mobilidade urbana local. Mais do que retratar o crescimento ou a composição quantitativa da frota, os resultados apresentados ao longo deste boletim revelam padrões estruturais, funcionais e espaciais que refletem a interação entre dinâmica socioeconômica, uso do território e políticas públicas de trânsito.\vskip0.3cm
+
+As análises descritivas e os gráficos apresentados indicam que a frota municipal é fortemente marcada pela predominância de veículos destinados ao transporte individual de passageiros, em especial automóveis e motocicletas. Tal configuração reforça um modelo de mobilidade centrado no uso individual do veículo, com implicações diretas sobre a fluidez do tráfego, a demanda por infraestrutura viária, a pressão sobre o espaço urbano e os níveis de exposição a riscos no trânsito.\vskip0.3cm
+
+A avaliação da matriz energética da frota evidencia a prevalência de combustíveis de origem fóssil, com destaque para gasolina, flex e diesel, distribuídos de forma diferenciada entre as espécies veiculares. O cruzamento entre espécie e tipo de combustível revela padrões consistentes de uso, como a associação do diesel a veículos de carga e a predominância de combustíveis leves nos veículos de passageiros. Esses achados constituem uma linha de base técnica essencial para subsidiar políticas de transição energética, planejamento da infraestrutura de abastecimento e avaliações futuras de impacto ambiental.\vskip0.3cm
+
+No que se refere à origem de fabricação, a análise por nacionalidade demonstra uma frota amplamente dominada por veículos de produção nacional, com participação residual de veículos importados. Esse padrão reflete características estruturais do mercado automotivo brasileiro e possui implicações diretas para a gestão pública, especialmente no que diz respeito à fiscalização, à manutenção veicular e à padronização das ações administrativas associadas ao licenciamento.\vskip0.3cm
+
+A análise espacial da frota, por meio do ranking dos bairros com maior concentração de veículos licenciados, evidencia uma distribuição territorial assimétrica, com a formação de polos de adensamento veicular associados a áreas de maior densidade populacional e atividade econômica. A identificação desses núcleos constitui subsídio fundamental para o direcionamento de intervenções de engenharia de tráfego, ações de fiscalização preventiva, ordenamento do estacionamento e priorização do transporte coletivo.\vskip0.3cm
+
+Do ponto de vista metodológico e institucional, a utilização de ferramentas de ciência aberta, como a linguagem R e o ecossistema Quarto, consolida um novo paradigma de produção de informação pública no âmbito do trânsito. A geração de boletins parametrizados, reprodutíveis e auditáveis fortalece a transparência administrativa e amplia a capacidade do Estado em realizar diagnósticos contínuos, comparáveis ao longo do tempo e ajustáveis às especificidades territoriais.\vskip0.3cm
+
+Em síntese, este boletim estatístico configura-se como um instrumento técnico de apoio à formulação e ao monitoramento de políticas públicas de mobilidade urbana em r params$cidade_selecionada, respeitando o recorte temporal definido pelo usuário. Os resultados aqui apresentados inauguram um ciclo permanente de análise baseada em evidências, contribuindo para decisões mais eficientes, seguras e sustentáveis no âmbito da gestão do trânsito e da mobilidade urbana.
+
+
+
+\newpage
+
+# REFERÊNCIAS BIBLIOGRÁFICAS
+
+
+ANFAVEA. Anuário da Indústria Automobilística Brasileira. São Paulo: Associação Nacional dos Fabricantes de Veículos Automotores, 2023. \vskip0.3cm
+
+BRASIL, Lei nº 12.527, de 18 de novembro de 2011. Regula o acesso a informações prevista no inciso XXXIII do art.5º, no inciso II do § 3º do art. 37 e no § 2º do art. 216 da Constituição Federal altera a Lei nº 8.112, de 11 de dezembro de 1990.; revoga a Lei nº 11.111, de 5 de maio de 2005, e dispositivos da Lei nº 8.159, de 8 de janeiro de 1991, e dá outras providências. Diário Oficial da União: seção 1, Brasília, DF, p.1, 18 nov, 2011. Edição Extra. \vskip0.3cm
+
+BORGES, L. A.; SILVA, C. A. Mobilidade elétrica no Brasil: desafios tecnológicos, econômicos e institucionais. Revista de Administração Pública, Rio de Janeiro, v. 57, n. 2, p. 421–445, 2023. \vskip0.3cm
+
+COSTA, R. S.; GUIMARÃES, L. F.; RIBEIRO, S. K. Veículos elétricos no Brasil: barreiras, oportunidades e políticas públicas. Revista Brasileira de Energia, v. 27, n. 1, p. 67–92, 2021. \vskip0.3cm
+
+DENG, Y. et al. Large-scale adoption of electric vehicles in China and its environmental impacts. Energy Policy, v. 170, p. 113–128, 2023. \vskip0.3cm
+
+DUARTE, Lucas Henrique de Almeida. A cor do veículo influencia o risco de roubo e furto? Uma análise empírica a partir do método de exposição induzida. 2023. Monografia (Graduação em Ciências Sociais Aplicadas) – Universidade Federal de Minas Gerais, Belo Horizonte, 2023. \vskip0.3cm
+
+FÆHN, T. et al. Norway’s path to electric vehicle dominance: policy lessons and impacts. Transportation Research Part D, v. 102, p. 103–121, 2022.  \vskip0.3cm
+
+FURNESS, Sarah; CONNOR, Jeff; ROBINSON, Elizabeth; NORTON, Robyn. Car colour and risk of car crash injury: population based case control study. BMJ – British Medical Journal, London, v. 340, p. c231, 2010. DOI: 10.1136/bmj.c231. \vskip0.3cm
+
+GOLDEMBERG, J.; LUCON, O. Energy and environmental challenges in Brazil. Energy Policy, v. 118, p. 1–10, 2018. \vskip0.3cm
+
+IEA. Global EV Outlook 2024. Paris: International Energy Agency, 2024. \vskip0.3cm
+
+LARDELLI-CLARET, Pablo et al. Vehicle colour and the risk of being seriously injured in a crash. Injury Prevention, London, v. 19, n. 3, p. 180–186, 2013. DOI: 10.1136/injuryprev-2012-040466. \vskip0.3cm
+
+LUCENA, Maria Eduarda Vasconcellos. Impactos do automóvel na mobilidade urbana no Brasil. 2017. 38 f. TCC (Graduação em Engenharia Civil) – Universidade Federal de Pernambuco, Recife, 2017.\vskip0.3cm
+
+NASCIMENTO, Márcio Silveira; NASCIMENTO, Márcio Silveira. Implantação e evolução da indústria automobilística no Brasil. Revista Tocantinense de Geografia, v.5, n.7, p.67–79, 2016. DOI:10.20873/rtg.v5n7p67-79. \vskip0.3cm
+
+NILSSON, M.; NORDLUND, A. Electric vehicle adoption in Norway: the role of incentives and consumer behavior. Energy Research & Social Science, v. 84, p. 102–118, 2022.
+
+OLIVEIRA FILHO, Marcos Ferreira de; VILANI, Rodrigo Machado. Da imobilidade à mobilidade urbana: o papel dos veículos no planejamento das cidades. Revista NUPEM, v.9, n.16, p.38–53, jan./abr. 2017.\vskip0.3cm
+
+
+ROLIM, Zionam E.L.; DE OLIVEIRA, Rafaël R.; DE OLIVEIRA, Hélio M. Industrial Concentration of the Brazilian Automobile Market and Positioning in the World Market. arXiv, 2019. \vskip0.3cm
+
+SILVA, Marcos Vinícius Pereira da. Perfil dos veículos envolvidos em ocorrências de roubo e furto no Brasil: uma análise exploratória a partir de registros policiais. Revista Brasileira de Segurança Pública, São Paulo, v. 18, n. 2, p. 45–62, 2024. \vskip0.3cm
+
+\newpage
+
+SILVA, Marcos Aurélio Maia da. Análise da incidência de roubo/furto de veículos: perfil do automóvel e variáveis associadas. Relatório de pesquisa (capítulo 3), Universidade — 2024.\vskip0.3cm
+
+SHE, Z. et al. Determinants of electric vehicle adoption in the United States. Transportation Research Part A, v. 148, p. 62–78, 2021. \vskip0.3cm
+
+SOVACOOL, B. K. et al. Policy mixes for sustainable mobility: lessons from electric vehicle diffusion. Energy Policy, v. 137, p. 111–120, 2020. \vskip0.3cm
+
+ZHOU, Y. et al. Transition pathways of electric vehicles in China’s urban transport system. Journal of Cleaner Production, v. 278, p. 123–145, 2021.
+
+
+
+
+
+
+

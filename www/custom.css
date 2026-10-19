@@ -1,0 +1,38 @@
+
+/* Paleta de Cores Customizada - Oficial do Governo do Pará */
+
+/* ----------------------------------------------------------------
+   1. COR PRIMÁRIA: Azul da bandeira como cor principal
+------------------------------------------------------------------- */
+.bg-primary, .main-header, .btn-primary {
+  background-color: #0071ce !important;
+  border-color: #0071ce !important;
+}
+
+.btn-primary:hover {
+  background-color: #0071ce !important; 
+  border-color: #0071ce !important;
+}
+
+.card-primary.card-outline {
+  border-top: 3px solid #0071ce !important;
+}
+
+/* ----------------------------------------------------------------
+   2. DESTAQUES: Vermelho da bandeira para elementos ativos
+------------------------------------------------------------------- */
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active {
+  background-color: #0071ce !important;
+  color: #FFFFFF !important;
+}
+
+/* ----------------------------------------------------------------
+   3. CABEÇALHOS DO MENU
+------------------------------------------------------------------- */
+.nav-header {
+  color: #FFFFFF !important;
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+}

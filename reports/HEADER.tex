@@ -1,0 +1,58 @@
+\usepackage[pages=some]{background}
+\usepackage{graphicx}
+\usepackage{ragged2e} % Para justificar textos
+\usepackage{multicol}
+\usepackage{fontawesome5}    % pacote novo
+\usepackage{enumitem}        % pacote novo
+\usepackage{xcolor}          % pacote novo
+
+
+
+\usepackage{float}
+\floatplacement{table}{H}
+\floatplacement{figure}{H}
+%\restylefloat{table}
+
+
+% Corrige posição dos títulos
+\usepackage{caption}
+\captionsetup[table]{position=above}
+\captionsetup[figure]{position=below}
+
+
+\usepackage{helvet}             % pacote novo
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+
+
+
+% Plano de fundo
+\backgroundsetup{
+  scale=1,
+  angle=0,
+  opacity=1,
+  contents={\includegraphics[width=\paperwidth,height=\paperheight]{../www/RASCUNHO_DETRAN.jpg}}
+}
+
+
+% Estilo do cabeçalho e rodapé
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\includegraphics[height=1cm]{../www/Detran2.jpg}}
+\fancyhead[R]{\small \textbf{BOLETIM DE  \\ FROTA VEICULAR}}
+
+
+
+\renewcommand{\headrulewidth}{0.4pt} % adiciona linha do cabeçalho
+\renewcommand{\footrulewidth}{0.4pt} % adiciona linha ao rodapé
+
+
+\fancyfoot[L]{\textbf{Boletim Técnico – DETRAN/PA}}  % rodapé à esquerda
+\fancyfoot[C]{Ano II - Número 1}                     % rodapé ao centro
+\fancyfoot[R]{Versão: \versao\ - \hoje}              % rodapé à direita
+
+
+
