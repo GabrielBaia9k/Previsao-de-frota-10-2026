@@ -602,7 +602,7 @@ pt_desenhar_projecoes <- function(
   if (limite_y <= 0) limite_y <- 1
 
   parametros <- graphics::par(
-    mar = c(4.5, 5.2, 5.2, 1.2),
+    mar = c(4.5, 6.5, 5.2, 1.2),
     las = 1
   )
   on.exit(graphics::par(parametros), add = TRUE)
@@ -612,12 +612,19 @@ pt_desenhar_projecoes <- function(
     rep(NA_real_, length(datas)),
     type = "n",
     xlab = "Data",
-    ylab = "Quantidade de veículos",
+    ylab = "",
     ylim = c(0, limite_y * 1.08),
     xlim = as.numeric(c(janela_inicio, janela_fim)),
     xaxt = "n",
     bty = "l"
   )
+
+  graphics::mtext(
+  "Quantidade de veículos",
+  side = 2,
+  line = 4.6,
+  las = 0
+)
 
   marcas <- pretty(datas, n = 10)
   graphics::axis.Date(1, at = marcas, format = "%b/%Y")

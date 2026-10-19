@@ -6,3 +6,32 @@ precompilacao/
 .Rproj.user/
 
 rsconnect/
+
+# Local data and user feedback; may be sensitive or too large for GitHub.
+/data/
+/feedback_data.csv
+
+# Secrets and local credentials.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+
+# Generated environments, caches, and temporary files.
+renv/library/
+renv/staging/
+.quarto/
+_site/
+_book/
+*.log
+*.tmp
+*.bak
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
