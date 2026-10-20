@@ -35,3 +35,9 @@ _book/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Vue application dependencies and generated assets.
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/

@@ -1,0 +1,461 @@
+% Modelo de artigos para conferencias da Sociedade Brasileira de Computacao.
+% Dependencias do modelo oficial: sbc-template.sty e sbc.bst.
+\documentclass[12pt,a4paper]{article}
+\usepackage{sbc-template}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx,url}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{calc, positioning, shapes.geometric, arrows.meta, fit, backgrounds}
+
+\sloppy
+\pagestyle{empty}
+
+\title{Previsões}
+
+\newif\iffinal
+\finaltrue % Use \finalfalse para omitir a autoria na revisao cega.
+
+
+\iffinal
+\author{Mário Diego Rocha Valente\inst{1}, Gabriel Baia da Silva\inst{2},
+Kleber Bezerra Salim\inst{1}, Tito Félix de Oliveira\inst{3}}
+
+\address{Gerência de Estatística -- DETRAN\\
+Belém -- PA -- Brasil
+\nextinstitute
+Faculdade de Computação -- Universidade Federal do Pará (UFPA)\\
+Belém -- PA -- Brasil
+\nextinstitute
+Gerência de Desenvolvimento -- DETRAN\\
+Belém -- PA -- Brasil
+\email{\{mario.valente,kleber.salim,tito.oliveira\}@detran.pa.gov.br}
+\email{gabrielkadran@gmail.com}
+}
+\else
+\author{Autoria omitida para revisão cega}
+\address{}
+\fi
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+% ===================== RESUMOS (INGLÊS E PORTUGUÊS) =====================
+% Preencher abstract e resumo: ate 10 linhas cada, ambos na primeira pagina.
+
+\begin{abstract}
+
+\end{abstract}
+
+\begin{resumo}
+
+\end{resumo}
+
+% O modelo SBC nao inclui blocos de palavras-chave. Termos preservados
+% para uso caso a chamada do evento os exija:
+% Keywords: Analytical Dashboard; Interactive Visualization; Temporal Series;
+% Predictive Modeling; Deep Learning; Public Transparency.
+% Palavras-chave: Dashboard Analítico; Visualização Interativa; Séries Temporais;
+% Modelagem Preditiva; Aprendizado Profundo; Transparência Pública.
+
+% ===================== CORPO DO ARTIGO =====================
+
+\section{Introdução}
+
+
+
+%------------------------------------------------------------------------------
+\section{Trabalhos Relacionados}
+
+
+%---------------------------------------------------------------------------%
+
+\section{Materiais e Métodos}
+
+
+%----------------------------------------------------------------------------------%
+
+\section{Modelagem Estatística e Deep Learning}
+
+Adotou-se a abordagem de \textit{storytelling} analítico de Knaflic (2019) para projetar os dados espacialmente e temporalmente. As seções a seguir fundamentam os algoritmos preditivos empregados. 
+
+\subsection{Modelos Estatísticos Clássicos (Família ARIMA)}
+Os modelos estatísticos clássicos pertencentes à família ARIMA são amplamente empregados por sua capacidade nativa de absorver tendências seculares e padrões de autocorrelação \cite{box1970time}. O modelo base $\textbf{ARIMA(p,d,q)}$ é dado por~(\ref{eq:arima}).
+
+\begin{equation}
+\phi(L)\Delta^{d} y_{t} = \theta(L)\varepsilon_{t}
+\label{eq:arima}
+\end{equation}
+
+Em que $\phi(L)$ e $\theta(L)$ representam, respectivamente, os componentes autorregressivo e de médias móveis, cujas ordens são dadas por $p$ e $q$; $d$ é o grau de diferenciação integrativa, $L$ é o operador de defasagem e $\varepsilon_t$ representa o ruído branco. A sazonalidade de 12 meses observada na arrecadação de IPVA e licenciamentos é tratada no $SARIMA(p,d,q)(P,D,Q)_{12}$, Equação~(\ref{eq:sarima}).
+
+\begin{equation}
+\phi(L)\Phi(L^{12})\Delta^{d}\Delta_{12}^{D} y_{t} = \theta(L)\Theta(L^{12})\varepsilon_{t}
+\label{eq:sarima}
+\end{equation}
+
+Em que $\Phi(L^{12})$ e $\Theta(L^{12})$ representam os componentes sazonais autorregressivo e de médias móveis, cujas ordens são dadas por $P$ e $Q$, enquanto $D$ corresponde ao grau de diferenciação sazonal.
+
+Para mitigação de anomalias econômicas, aplicou-se o modelo avançado $SARIMAX(p,d,q)(P,D,Q)_{12}$, Equação~(\ref{eq:sarimax}), que incorpora uma matriz de regressores exógenos ($X_t$).
+
+\begin{equation}
+\phi(L)\Phi(L^{12})\Delta^{d}\Delta_{12}^{D} y_{t} = \theta(L)\Theta(L^{12})\varepsilon_{t} + \beta X_{t}
+\label{eq:sarimax}
+\end{equation}
+
+O vetor $X_t$ modelou de forma exógena as retrações macroeconômicas sofridas pelo Brasil (2013--2017), servindo como intervenção de "pulso" para garantir a estabilidade assintótica a longo prazo.
+
+\subsection{Redes Neurais Recorrentes e Modelagem Tensorial (GRU)}
+
+Para a captura de não linearidades severas de longo alcance, projetaram-se arquiteturas de \textit{Deep Learning}: \textbf{LSTM} (\textit{Long Short-Term Memory}) e \textbf{GRU} (\textit{Gated Recurrent Unit}). A implementação utilizou \texttt{keras} e \texttt{tensorflow} via R, otimizada com Adam e backpropagation-through-time (BPTT).
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.6\columnwidth]{LSTM.png}
+    \caption{Representação da célula LSTM
+    \cite{ghojogh2023recurrentneuralnetworkslong}.}
+    \label{fig:lstm}
+\end{figure}
+\begin{figure}[!ht]
+    \centering
+   \includegraphics[width=0.6\columnwidth]{GRU.png}
+    \caption{Representação da célula GRU
+    \cite{ghojogh2023recurrentneuralnetworkslong}.}
+    \label{fig:celula_gru}
+\end{figure}
+
+Redes neurais recorrentes convencionais frequentemente esbarram na limitação do gradiente descendente (\textit{vanishing gradient}), o que dificulta o aprendizado de dependências temporais extensas. A arquitetura LSTM resolve esse problema introduzindo mecanismos de controle de fluxo de informação chamados de portões (\textit{gates}): o portão de esquecimento (\textit{forget gate}), responsável por descartar dados irrelevantes; o portão de entrada (\textit{input gate}), que assimila novas informações à memória; e o portão de saída (\textit{output gate}), responsável por transmitir os valores processados para os estados subsequentes da rede \cite{hochreiter1997}.
+
+\begin{table}[htbp]
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.25}
+\centering
+\caption{Parâmetros utilizados no modelo \textit{LSTM}.}
+\label{tab:parametros_lstm}
+\begin{tabular}{
+>{\bfseries\raggedright\arraybackslash}p{0.34\columnwidth}
+>{\raggedright\arraybackslash}p{0.54\columnwidth}
+}
+\toprule
+\textbf{Parâmetro} & \textbf{Configuração} \\
+\midrule
+
+Escopo do modelo
+& Uma rede independente por localidade \\
+\hline
+
+Período histórico
+& 2016--2025, totalizando 120 meses \\
+\hline
+
+Janela de entrada
+& 24 meses anteriores \\
+\hline
+
+Treinamento(n)
+& 84 janelas por localidade \\
+\hline
+
+Conjunto de teste
+& 12 meses finais da série \\
+\hline
+
+Dimensão da entrada
+& $24 \times 13$ \\
+\hline
+
+Variáveis de entrada
+& Resíduo normalizado e 12 indicadores mensais \\
+\hline
+
+Pré-processamento
+& Tendência quadrática e normalização $Z$-score \\
+\hline
+
+Arquitetura
+& $\mathrm{LSTM}(32) \rightarrow \mathrm{Dense}(1)$ \\
+\hline
+
+Função de perda
+& Erro quadrático médio (MSE) \\
+\hline
+
+Otimizador
+& Adam, com taxa de aprendizado $0{,}01$ \\
+\hline
+
+Número de épocas
+& 100 \\
+\hline
+
+Tamanho do lote
+& 8 \\
+\hline
+
+Validação interna
+& 10\% das janelas de treinamento \\
+\hline
+
+Semente aleatória
+& 42 \\
+\hline
+
+Horizonte futuro
+& 72 meses, com previsão recursiva \\
+\hline
+
+Histórico das perdas
+& \texttt{Loss}/\texttt{Val\_Loss} por época/local. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As redes neurais recorrentes foram treinadas utilizando janelas deslizantes de 24 meses. A implementação LSTM ajustou uma rede independente para cada localidade, enquanto a arquitetura GRU foi treinada globalmente, incorporando uma codificação \textit{one-hot} para identificar cada localidade. Em ambas as arquiteturas, a camada recorrente possui 32 unidades e é seguida por uma camada densa com uma unidade, responsável pela previsão de um único passo temporal.
+
+A série histórica utilizada pelas redes compreendeu o período de 2016 a 2025, totalizando 120 observações mensais, quando não considerados eventuais meses ausentes. A aplicação da janela de 24 meses produziu 96 janelas supervisionadas por localidade, das quais 84 foram destinadas ao treinamento e 12 foram reservadas para o teste temporal. As previsões futuras foram obtidas recursivamente, um mês por vez, até o horizonte de 72 meses.
+
+\begin{table}[htbp]
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.25}
+\centering
+\caption{Parâmetros utilizados no modelo \textit{GRU} global.}
+\label{tab:parametros_gru}
+\begin{tabular}{
+>{\bfseries\raggedright\arraybackslash}p{0.34\columnwidth}
+>{\raggedright\arraybackslash}p{0.54\columnwidth}
+}
+\toprule
+\textbf{Parâmetro} & \textbf{Configuração} \\
+\midrule
+
+Escopo do modelo
+& Uma única rede global para todas as localidades \\
+\hline
+
+Período histórico
+& 2016--2025, totalizando 120 meses \\
+\hline
+
+Janela de entrada
+& 24 meses anteriores \\
+\hline
+
+Amostras de treinamento
+& 84 janelas por localidade, concatenadas no tensor global \\
+\hline
+
+Conjunto de teste
+& 12 meses finais da série \\
+\hline
+
+Dimensão da entrada
+& $24 \times (13 + N_{\mathrm{loc}})$ \\
+\hline
+
+Variáveis de entrada
+& Ruído normalizado, 12 indicadores mensais e indicadores da localidade \\
+\hline
+
+Pré-processamento
+& Tendência quadrática, perfil sazonal mensal e normalização do ruído \\
+\hline
+
+Arquitetura
+& $\mathrm{GRU}(32) \rightarrow \mathrm{Dense}(1)$ \\
+\hline
+
+Função de perda
+& Erro quadrático médio (MSE) \\
+\hline
+
+Otimizador
+& Adam, com taxa de aprendizado $0{,}01$ \\
+\hline
+
+Número de épocas
+& 50 \\
+\hline
+
+Tamanho do lote
+& 32 \\
+\hline
+
+Validação interna
+& 10\% das janelas de treinamento \\
+\hline
+
+Semente aleatória
+& 42 \\
+\hline
+
+Horizonte futuro
+& 72 meses, com previsão recursiva \\
+\hline
+
+Histórico das perdas
+& \texttt{Loss}/\texttt{Val\_Loss} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+O treinamento foi realizado por meio da função de perda erro quadrático médio (MSE), utilizando o otimizador Adam com taxa de aprendizado igual a 0,01. A rede LSTM foi treinada durante 100 épocas, com lotes de oito janelas, enquanto a rede GRU foi treinada durante 50 épocas, com lotes de 32 janelas. Em ambos os casos, 10\% das janelas de treinamento foram utilizadas para validação interna.
+
+Devido ao número reduzido de observações presentes optamos por deixar o LSTM de lado e seguirmos para uma implementação GRU inovadora, explicada a frente, que tenta resolver o problema da esparcidade dos registros analisados.
+
+Enquanto a LSTM possui um custo computacional maior devido ao uso constante desses três \textit{gates}, a GRU otimiza significativamente esse processo fundindo os estados ocultos e utilizando apenas dois mecanismos principais: o portão de atualização (\textit{update gate}) e o portão de redefinição (\textit{reset gate}) \cite{cho2014learning}. Para formalizar a dinâmica de aprendizado da célula GRU, que obteve o melhor desempenho neste estudo, o fluxo de informação no instante $t$ é governado pelas seguintes equações:
+
+$$z_t = \sigma(W_z x_t + U_z h_{t-1} + b_z)$$
+$$r_t = \sigma(W_r x_t + U_r h_{t-1} + b_r)$$
+$$\tilde{h}_t = \tanh(W_h x_t + U_h (r_t \odot h_{t-1}) + b_h)$$
+$$h_t = (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t$$
+
+Onde $\sigma$ denota a função de ativação sigmoide não linear, $\odot$ representa o produto de Hadamard (\textit{element-wise}), $x_t$ é o vetor de entrada multivariado, $h_{t-1}$ é o estado oculto da iteração anterior. As matrizes de pesos $W$ e $U$, bem como os vetores de viés $b$, constituem os parâmetros hiperdimensionais otimizados iterativamente pelo otimizador Adam durante a fase de convergência.
+
+%\newpage
+Para resolver o problema prático de ausência de granularidade temporal nas cidades do interior do estado (esparsidade de amostras), este trabalho propõe uma abordagem de \textbf{engenharia de tensores multidimensionais}, ilustrada na Fig.~\ref{fig:gru_fluxo}.
+
+\begin{figure}[!ht]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}[
+    node distance=1cm and 1.2cm,
+    box/.style={draw, rectangle, rounded corners=4pt, minimum width=2.8cm, minimum height=1.5cm, align=center, font=\small},
+    arrow/.style={-Stealth, thick, color=black!80}
+]
+% Nodes
+\node[box, fill=blue!10, draw=blue!40] (tensor) {\textbf{Tensor de Entrada 3D}\\ {\scriptsize (Modelagem de Dados)}\\[6pt] \footnotesize $[Amostras \times Passos \times Variáveis]$ \\ \footnotesize $(M \times 24 \times N)$};
+
+\node[box, right=of tensor, fill=green!10, draw=green!50] (gru) {\textbf{Camada GRU}\\ \footnotesize Extração de Padrões\\ \footnotesize Espaço-Temporais Ocultos};
+
+\node[box, right=of gru, fill=orange!10, draw=orange!50] (dense) {\textbf{Camada Densa}\\ \footnotesize Recombinação Linear\\ \footnotesize (Função de Ativação Linear)};
+
+\node[box, right=of dense, fill=red!10, draw=red!40] (output) {\textbf{Vetor de Saída}\\ \footnotesize Previsão $t+h$\\ \footnotesize (Municípios Consolidados)};
+
+% Arrows
+\draw[arrow] (tensor) -- node[above, font=\scriptsize] {\textit{Batching}} (gru);
+\draw[arrow] (gru) -- node[above, font=\scriptsize] {$H_{t}$} (dense);
+\draw[arrow] (dense) -- (output);
+\end{tikzpicture}%
+}
+\caption{Esquema da modelagem de dados para o algoritmo GRU empregado.}
+\label{fig:gru_fluxo}
+\end{figure}
+
+Em vez de instanciar dezenas de modelos independentes para cada município (o que sobrecarregaria a infraestrutura e impediria a convergência de cidades pequenas), optou-se por uma decomposição tensorial. Primeiramente, estabilizou-se a variância e a escala das curvas através da normalização Z-score em cada vetor municipal, dada por:
+
+$$z = \frac{x - \mu}{\sigma}$$
+
+Onde $\mu$ é a média histórica e $\sigma$ é o desvio padrão da frota do município. Após essa etapa geométrica, os vetores padronizados foram acoplados aos \textit{lags} temporais, originando uma matriz de $N$ colunas. Esse arranjo estrutural resulta num \textit{tensor de entrada global} tridimensional. Essa topologia força a camada densa da GRU a transferir a \textit{feature representation} dos padrões de crescimento de grandes polos urbanos para mitigar as dinâmicas escassas de municípios menores.
+
+%-------------------------------------------------------------------------------%
+\subsection{Subsistema de Relatórios Parametrizados (Quarto)}
+
+
+%-------------------------------------------------------------------------------%
+\subsection{Metodologia de Deployment e Integração Contínua}
+
+Para garantir resiliência e alta disponibilidade, implementou-se um fluxo \textit{DevOps} e CI/CD (Integração/Entrega Contínuas), ilustrado na Figura.~\ref{fig:deployment}. O ecossistema \textit{Podman} \cite{podman2026} atua na criação da imagem imutável do sistema operacional Linux que embala o código R, suas dependências sistêmicas (C++) e o código fonte. 
+
+O repositório é gerenciado via \textit{GitLab} CI, automatizando os testes e enviando as imagens para o \textit{Registry}. O cluster Kubernetes \cite{burns2016borgomega} consome essas imagens, orquestrando réplicas de contêineres (\textit{Pods}) conforme a demanda. Um dos principais desafios técnicos de aplicações assíncronas baseadas em soquetes (Shiny) sob balanceamento de carga é a perda de estado. Isso foi solucionado configurando-se o \textit{Ingress Controller} do Kubernetes com "afinidade de sessão" (\textit{sticky sessions} via \textit{cookies}). 
+
+Tal técnica, combinada com protocolo criptografado estrito (WSS - \textit{WebSocket Secure}), garante que requisições longas, como a compilação paralela de pesados PDFs em LaTeX pelo \textit{Quarto}, não sofram \textit{timeout} ou interrupções de rota.
+
+
+\section{Resultados e Discussão}
+
+\subsection{Resultados da Modelagem e Avaliação Preditiva}
+
+Para subsidiar tomadas de decisões a longo prazo, o sistema expõe o painel de Previsão Analítica, mostrado na Fig.~\ref{fig:PainelPrevisoes}. Como a arquitetura estipula que a inferência preditiva ocorra de maneira agnóstica na fase de pré-processamento para não onerar o tempo de resposta do \textit{host}, os vetores resultantes até o horizonte temporal de 2031 foram precalculados, salvos no sistema de arquivos e carregados reativamente no \texttt{Shiny}.
+
+A acurácia e a estabilidade de convergência dos modelos foram aferidas empregando-se métricas consagradas na literatura de previsão de séries temporais e aprendizado de máquina \cite{hyndman2021forecasting, goodfellow2016deep}. Para avaliar a magnitude dos resíduos e o desvio relativo, calcularam-se o Erro Absoluto Médio (MAE), o Erro Percentual Absoluto Médio (MAPE) e a Raiz do Erro Quadrático Médio (RMSE) \cite{hyndman2021forecasting}, definidos pelas seguintes equações:
+
+$$MAE = \frac{1}{n} \sum_{t=1}^{n} |y_t - \hat{y}_t|$$
+$$MAPE = \frac{100\%}{n} \sum_{t=1}^{n} \left| \frac{y_t - \hat{y}_t}{y_t} \right|$$
+$$RMSE = \sqrt{\frac{1}{n} \sum_{t=1}^{n} (y_t - \hat{y}_t)^2}$$
+
+Onde $y_t$ representa a contagem real da frota observada no instante $t$, $\hat{y}_t$ é a projeção preditiva correspondente gerada pelos algoritmos e $n$ determina a dimensão temporal da janela de teste. Para mensurar a proporção da variância global explicada pelo modelo, adotou-se o Coeficiente de Determinação ($R^2$) \cite{goodfellow2016deep}:
+
+$$R^2 = 1 - \frac{\sum_{t=1}^{n} (y_t - \hat{y}_t)^2}{\sum_{t=1}^{n} (y_t - \bar{y})^2}$$
+
+Sendo $\bar{y}$ a média global das observações reais da frota. Adicionalmente, para os algoritmos estatísticos (onde a estimativa de máxima verossimilhança é diretamente computável), penalizou-se o excesso de complexidade paramétrica para evitar sobreajuste (\textit{overfitting}) através do Critério de Informação de Akaike (AIC) e do Critério de Informação Bayesiano (BIC) \cite{box1970time, hyndman2021forecasting}:
+
+$$AIC = 2k - 2\ln(\hat{L})$$
+$$BIC = k\ln(n) - 2\ln(\hat{L})$$
+
+Em que $k$ representa o número de parâmetros estimados de forma independente pelo modelo e $\hat{L}$ é o valor máximo da função de verossimilhança para o estimador.
+
+Entre os algoritmos estatísticos, o SARIMAX capturou de forma exímia os resíduos sazonais de 12 meses (IPVA) e as quebras estruturais induzidas por instabilidades fiscais anteriores. Ele obteve um MAPE de 5,78\% e coeficiente de determinação global ($R^2$) de 0,7240, o gráfico é mostrado na Fig.~\ref{fig:sarimax}.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{GraficoSarimax.png}
+    \caption{Previsão estatística de crescimento obtida com o modelo SARIMAX.}
+    \label{fig:sarimax}
+\end{figure}
+
+Nas redes neurais complexas, o cenário difere. O LSTM enfrentou o problema de dados escassos, levando a uma série que não capturou a sazonalidade da série da mesma forma. Entretanto, a otimização algorítmica e topológica executada sobre o GRU, embasada no Tensor Global Multidimensional (descrito na metodologia), resultou em predições fiéis ao comportamento das curvas, mostrado na Fig.~\ref{fig:gru}.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{GraficoGRU.png}
+    \caption{Projeção suavizada obtida com a arquitetura tensorial do GRU.}
+    \label{fig:gru}
+\end{figure}
+
+Os algoritmos foram validados com uma janela de teste de 12 meses no final do treinamento. As métricas comparativas consolidadas de validação (\textit{test-set evaluation}) entre as metodologias testadas estão expostas na Tabela~\ref{tab:comparacao_modelos}. A eficácia do algoritmo GRU evidenciou-se na obtenção do menor erro da rodada ($MAPE = 5,19\%$). Sua matriz simplificada de dois gates reduziu o montante paramétrico que necessitava ser aprendido.
+
+\begin{table}[!ht]
+\renewcommand{\arraystretch}{1.3}
+\centering
+\caption{Comparação das métricas de desempenho no conjunto de validação dos modelos testados.}
+\label{tab:comparacao_modelos}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Modelo} & \textbf{MAPE} & \textbf{MAE} & \textbf{RMSE} & \textbf{AIC} & \textbf{BIC} & \textbf{$R^2$} \\
+\midrule
+LSTM    & 9,07 & 1,803 & 2,292 & NA & NA & 0,2581 \\
+GRU     & \textbf{5,19} & \textbf{1,129} & 1,634 & NA & NA & 0,6230 \\
+ARIMA   & 9,18 & 1,855 & 2,203 & 188,74 & 189,71 & 0,3150 \\
+SARIMA  & 6,75 & 1,406 & 1,660 & 181,94 & 182,91 & 0,6111 \\
+SARIMAX & 5,78 & 1,198 & \textbf{1,398} & \textbf{177,83} & \textbf{178,80} & \textbf{0,7240} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+A engenharia preditiva combinada (mais de 140 municípios versus 84 meses efetivos) alimentou a rede neural com mais de 12 mil exemplos de treinamento, viabilizando o entendimento do crescimento como um tecido interligado. 
+
+Em suma, ambos os modelos de ponta (SARIMAX para variância explicada e GRU para mitigação de erro absoluto) apontaram para o mesmo limiar logístico: um acréscimo explosivo de cerca de 60 mil novos veículos circulantes anualmente, saturando a infraestrutura das principais rodovias estaduais até 2031.
+
+Do ponto de vista governamental, o acréscimo contínuo estimado e evidenciado pelos modelos preditivos na ordem de milhares de veículos gera consequências sistêmicas de amplo aspecto. Em primeira instância, o aumento acentuado da taxa de motorização acende o alerta para o esgotamento do planejamento urbano contemporâneo, pressionando diretamente as pastas governamentais a remodelar a estrutura rodoviária, semafórica e ampliar fortemente a disponibilidade de transportes multimodais eficientes.
+
+A capacidade do algoritmo de Deep Learning (GRU) de atuar em rede com dados transversais e alcançar um erro marginal de apenas 5\% transforma-o num ativo crucial de inteligência institucional. Paralelamente, prever com precisão a malha veicular permite à secretaria estadual de fazenda estimar, em níveis muito granulares, a arrecadação trilionária de licenciamentos e IPVA ao longo da década, alinhando despesas públicas a receitas fidedignas. O rigor estocástico garantido pelo SARIMAX isolando o choque econômico reitera a tese de que soluções algorítmicas conjuntas (ensemble thinking) são indispensáveis em análises estatais complexas.
+
+Ao converter tais fluxos matemáticos intrincados em um Dashboard Shiny aberto e relatórios Quarto dinâmicos gerados em segundos, o órgão de trânsito não apenas extinguiu o processamento manual moroso dos setores de estatística, mas materializou o espírito central da Lei de Acesso à Informação. Trata-se do rompimento do sigilo burocrático e da ascensão de uma era onde a sociedade civil, a academia e o gestor visualizam assincronamente as mesmas inferências tecnológicas, promovendo uma fiscalização cidadã em larga escala sobre a evolução estrutural e os padrões de mobilidade da sua própria região.
+
+
+\section{Considerações e Trabalhos Futuros}
+\label{sec:conclui}
+
+% ===================== DECLARACOES ADICIONAIS =====================
+
+\section*{Agradecimentos}
+Aos órgãos de fomento à pesquisa e às equipes de tecnologia que disponibilizaram a base de dados anonimizada necessária para o desenvolvimento da plataforma.
+
+%\newpage
+\section*{Declaração sobre uso de Inteligência Artificial}
+Declaro que ferramentas de Inteligência Artificial Generativa foram utilizadas neste trabalho nas seguintes etapas: Grandes Modelos de Linguagem (LLMs) foram utilizados para a revisão ortográfica e gramatical do texto, na etapa de escrita final do artigo. Todo o conteúdo gerado foi revisado criticamente e validado pelo autor, que assume integral responsabilidade pela originalidade e veracidade do texto final, em conformidade com a Portaria CNPq n° 2.664/2026.
+
+% ===================== REFERÊNCIAS =====================
+
+\bibliographystyle{sbc}
+\bibliography{referencias}
+
+\end{document}
